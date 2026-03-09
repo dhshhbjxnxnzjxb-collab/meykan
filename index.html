@@ -5,430 +5,551 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CoreXT AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing:border-box; margin:0; padding:0; }
 
 :root {
-  --bg: #08080f;
-  --surface: #0f0f1a;
-  --surface2: #14141f;
-  --border: #1c1c2e;
-  --accent: #00e5ff;
-  --accent2: #0099bb;
-  --accentglow: rgba(0,229,255,0.15);
-  --text: #e8e6f0;
-  --muted: #5a5870;
+  --bg:#08080f; --surface:#0f0f1a; --surface2:#14141f; --border:#1c1c2e;
+  --accent:#00e5ff; --accent2:#0099bb; --accentglow:rgba(0,229,255,0.15);
+  --text:#e8e6f0; --muted:#5a5870;
 }
-
 [data-theme="light"] {
-  --bg: #f0f0f8;
-  --surface: #ffffff;
-  --surface2: #e8e8f5;
-  --border: #d0d0e8;
-  --text: #1a1a2e;
-  --muted: #7070a0;
+  --bg:#f2f2fa; --surface:#ffffff; --surface2:#eaeaf5;
+  --border:#d4d4ee; --text:#1a1a2e; --muted:#7070a0;
 }
-[data-accent="red"]   { --accent: #ff4466; --accent2: #cc2244; --accentglow: rgba(255,68,102,0.15); }
-[data-accent="green"] { --accent: #00ff88; --accent2: #00cc66; --accentglow: rgba(0,255,136,0.15); }
-[data-accent="orange"]{ --accent: #ff8800; --accent2: #cc6600; --accentglow: rgba(255,136,0,0.15); }
-[data-accent="cyan"]  { --accent: #00e5ff; --accent2: #0099bb; --accentglow: rgba(0,229,255,0.15); }
+[data-accent="red"]    { --accent:#ff4466; --accent2:#cc2244; --accentglow:rgba(255,68,102,0.15); }
+[data-accent="green"]  { --accent:#00ff88; --accent2:#00cc66; --accentglow:rgba(0,255,136,0.15); }
+[data-accent="orange"] { --accent:#ff8800; --accent2:#cc6600; --accentglow:rgba(255,136,0,0.15); }
+[data-accent="purple"] { --accent:#c084fc; --accent2:#9333ea; --accentglow:rgba(192,132,252,0.15); }
+[data-accent="cyan"]   { --accent:#00e5ff; --accent2:#0099bb; --accentglow:rgba(0,229,255,0.15); }
 
-html, body { height: 100%; overflow: hidden; }
+html,body { height:100%; overflow:hidden; }
+body { background:var(--bg); color:var(--text); font-family:'Outfit',sans-serif; display:flex; transition:background .3s,color .3s; }
 
-body {
-  background: var(--bg); color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  display: flex; transition: background 0.3s, color 0.3s;
-}
-
-.overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.55); z-index: 40;
-  backdrop-filter: blur(3px);
-}
-.overlay.show { display: block; }
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:40; backdrop-filter:blur(3px); }
+.overlay.show { display:block; }
 
 /* SIDEBAR */
 .sidebar {
-  width: 275px; height: 100vh;
-  background: var(--surface); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  position: fixed; left: 0; top: 0; z-index: 50;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  width:272px; height:100vh; background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  position:fixed; left:0; top:0; z-index:50;
+  transform:translateX(-100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
 }
-.sidebar.open { transform: translateX(0); }
+.sidebar.open { transform:translateX(0); }
 
 .sb-head {
-  padding: 18px 18px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  flex-shrink: 0;
+  padding:16px 14px 13px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
 }
 .sb-logo {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 8px; display: flex; align-items: center;
-  justify-content: center; font-weight: 800; font-size: 11px;
-  color: #000; box-shadow: 0 0 14px var(--accentglow);
+  width:32px; height:32px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:11px; color:#000;
+  box-shadow:0 0 14px var(--accentglow); flex-shrink:0;
 }
 .sb-title {
-  font-size: 0.95rem; font-weight: 700;
-  background: linear-gradient(90deg, var(--accent), var(--text));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  font-size:.95rem; font-weight:700;
+  background:linear-gradient(90deg,var(--accent),var(--text));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
 .sb-close {
-  margin-left: auto; background: none; border: none;
-  cursor: pointer; color: var(--muted); font-size: 18px; padding: 2px;
-  transition: color 0.2s;
+  margin-left:auto; background:none; border:none; cursor:pointer;
+  color:var(--muted); padding:4px; border-radius:6px; transition:color .2s;
+  display:flex; align-items:center;
 }
-.sb-close:hover { color: var(--text); }
+.sb-close:hover { color:var(--text); }
 
-.sb-body { overflow-y: auto; flex: 1; padding-bottom: 8px; }
-.sb-body::-webkit-scrollbar { width: 3px; }
-.sb-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.sb-body { overflow-y:auto; flex:1; padding-bottom:8px; }
+.sb-body::-webkit-scrollbar { width:3px; }
+.sb-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
-.sb-section { padding: 12px 14px 6px; }
-.sb-label {
-  font-size: 0.62rem; font-weight: 600; color: var(--muted);
-  letter-spacing: 0.12em; text-transform: uppercase;
-  font-family: 'Fira Code', monospace; margin-bottom: 7px;
+.sb-sec { padding:11px 12px 5px; }
+.sb-lbl {
+  font-size:.59rem; font-weight:600; color:var(--muted);
+  letter-spacing:.12em; text-transform:uppercase;
+  font-family:'Fira Code',monospace; margin-bottom:6px;
 }
 
 .topic-btn {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8px 11px; border-radius: 8px;
-  background: none; border: none; cursor: pointer;
-  color: var(--muted); font-family: 'Outfit', sans-serif;
-  font-size: 0.8rem; font-weight: 500;
-  transition: all 0.15s; text-align: left; width: 100%;
+  display:flex; align-items:center; gap:9px;
+  padding:8px 10px; border-radius:8px;
+  background:none; border:1px solid transparent; cursor:pointer;
+  color:var(--muted); font-family:'Outfit',sans-serif;
+  font-size:.8rem; font-weight:500;
+  transition:all .15s; text-align:left; width:100%;
 }
-.topic-btn:hover { background: var(--surface2); color: var(--text); }
-.topic-btn .ic { font-size: 15px; }
+.topic-btn:hover { background:var(--surface2); color:var(--text); }
+.topic-btn.active {
+  background:color-mix(in srgb,var(--accent) 10%,transparent);
+  color:var(--accent);
+  border-color:color-mix(in srgb,var(--accent) 22%,transparent);
+}
+.topic-btn svg { flex-shrink:0; }
 
-.nsfw-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 12px; border-radius: 10px;
-  background: var(--surface2); border: 1px solid var(--border);
+.setting-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 11px; border-radius:9px;
+  background:var(--surface2); border:1px solid var(--border); margin-bottom:6px;
 }
-.nsfw-info { flex: 1; }
-.nsfw-name { font-size: 0.82rem; font-weight: 600; }
-.nsfw-sub { font-size: 0.66rem; color: var(--muted); font-family: 'Fira Code', monospace; }
-.nsfw-tag {
-  display: none; font-size: 0.58rem; font-family: 'Fira Code', monospace;
-  background: #ff4466; color: white; padding: 1px 6px;
-  border-radius: 8px; margin-left: 5px; font-weight: 700;
-}
-.nsfw-tag.on { display: inline; }
+.setting-info { display:flex; align-items:center; gap:8px; }
+.setting-label { font-size:.8rem; font-weight:600; }
+.setting-sub { font-size:.63rem; color:var(--muted); font-family:'Fira Code',monospace; }
 
 .toggle {
-  width: 40px; height: 22px; background: var(--border);
-  border-radius: 11px; position: relative; cursor: pointer;
-  border: none; transition: background 0.3s; flex-shrink: 0;
+  width:38px; height:22px; background:var(--border);
+  border-radius:11px; position:relative; cursor:pointer;
+  border:none; transition:background .3s; flex-shrink:0;
 }
-.toggle.on { background: var(--accent); }
+.toggle.on { background:var(--accent); }
 .toggle::after {
-  content: ''; position: absolute;
-  width: 16px; height: 16px; background: white;
-  border-radius: 50%; top: 3px; left: 3px;
-  transition: transform 0.3s;
+  content:''; position:absolute; width:16px; height:16px;
+  background:white; border-radius:50%; top:3px; left:3px; transition:transform .3s;
 }
-.toggle.on::after { transform: translateX(18px); }
+.toggle.on::after { transform:translateX(16px); }
 
-.theme-grid {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-top: 4px;
-}
+.theme-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:5px; }
 .tdot {
-  height: 30px; border-radius: 7px; border: 2px solid transparent;
-  cursor: pointer; transition: all 0.2s;
+  height:28px; border-radius:7px; border:2px solid transparent;
+  cursor:pointer; transition:all .2s;
 }
-.tdot:hover { transform: scale(1.05); }
-.tdot.active { border-color: var(--text); }
-.tdot[data-c="cyan"]   { background: linear-gradient(135deg,#00e5ff,#0099bb); }
-.tdot[data-c="red"]    { background: linear-gradient(135deg,#ff4466,#cc2244); }
-.tdot[data-c="green"]  { background: linear-gradient(135deg,#00ff88,#00cc66); }
-.tdot[data-c="orange"] { background: linear-gradient(135deg,#ff8800,#cc6600); }
+.tdot:hover { transform:scale(1.07); }
+.tdot.active { border-color:var(--text); }
+.tdot[data-c="cyan"]   { background:linear-gradient(135deg,#00e5ff,#0099bb); }
+.tdot[data-c="red"]    { background:linear-gradient(135deg,#ff4466,#cc2244); }
+.tdot[data-c="green"]  { background:linear-gradient(135deg,#00ff88,#00cc66); }
+.tdot[data-c="orange"] { background:linear-gradient(135deg,#ff8800,#cc6600); }
+.tdot[data-c="purple"] { background:linear-gradient(135deg,#c084fc,#9333ea); }
 
-.mode-row { display: flex; gap: 6px; margin-top: 4px; }
+.mode-row { display:flex; gap:6px; margin-top:5px; }
 .mode-btn {
-  flex: 1; padding: 7px; border-radius: 8px;
-  border: 1px solid var(--border); background: none;
-  cursor: pointer; color: var(--muted);
-  font-family: 'Outfit', sans-serif; font-size: 0.75rem;
-  transition: all 0.2s;
+  flex:1; padding:7px; border-radius:8px;
+  border:1px solid var(--border); background:none;
+  cursor:pointer; color:var(--muted);
+  font-family:'Outfit',sans-serif; font-size:.74rem;
+  transition:all .2s; display:flex; align-items:center; justify-content:center; gap:5px;
 }
-.mode-btn:hover, .mode-btn.active {
-  background: var(--surface2); color: var(--text); border-color: var(--accent);
-}
+.mode-btn.active, .mode-btn:hover { background:var(--surface2); color:var(--text); border-color:var(--accent); }
 
-.clear-btn {
-  margin: 8px 14px;
-  padding: 10px; border-radius: 10px;
-  background: none; border: 1px solid var(--border);
-  color: var(--muted); cursor: pointer;
-  font-family: 'Outfit', sans-serif; font-size: 0.78rem;
-  transition: all 0.2s; display: flex; align-items: center;
-  justify-content: center; gap: 7px; width: calc(100% - 28px);
+.font-row { display:flex; gap:5px; margin-top:5px; }
+.font-btn {
+  flex:1; padding:6px; border-radius:7px; border:1px solid var(--border);
+  background:none; cursor:pointer; color:var(--muted);
+  font-family:'Outfit',sans-serif; font-size:.72rem; transition:all .2s;
 }
-.clear-btn:hover { border-color: #ff4466; color: #ff4466; }
+.font-btn.active, .font-btn:hover { background:var(--surface2); color:var(--text); border-color:var(--accent); }
+
+.stats-box {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:9px; padding:9px 11px; margin-top:4px;
+}
+.stat-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; }
+.stat-label { font-size:.7rem; color:var(--muted); font-family:'Fira Code',monospace; }
+.stat-val { font-size:.7rem; color:var(--accent); font-family:'Fira Code',monospace; font-weight:600; }
+
+.action-btn {
+  margin:6px 12px 0;
+  padding:9px 12px; border-radius:9px;
+  background:none; border:1px solid var(--border);
+  color:var(--muted); cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:.77rem;
+  transition:all .2s; display:flex; align-items:center;
+  gap:8px; width:calc(100% - 24px);
+}
+.action-btn:hover { border-color:var(--accent); color:var(--accent); }
+.action-btn.danger:hover { border-color:#ff4466; color:#ff4466; }
 
 .sb-footer {
-  padding: 12px 14px; border-top: 1px solid var(--border);
-  font-size: 0.62rem; color: var(--muted);
-  font-family: 'Fira Code', monospace; line-height: 1.7;
-  flex-shrink: 0;
+  padding:11px 14px; border-top:1px solid var(--border);
+  font-size:.59rem; color:var(--muted);
+  font-family:'Fira Code',monospace; line-height:1.7; flex-shrink:0;
 }
 
 /* MAIN */
-.main { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
+.main { flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
 
 header {
-  height: 56px; padding: 0 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(14px); flex-shrink: 0;
+  height:54px; padding:0 12px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:9px;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:blur(14px); flex-shrink:0;
 }
 .ham {
-  width: 34px; height: 34px; border-radius: 8px;
-  background: var(--surface2); border: 1px solid var(--border);
-  cursor: pointer; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 4px;
-  transition: border-color 0.2s; flex-shrink: 0;
+  width:34px; height:34px; border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:border-color .2s; flex-shrink:0;
 }
-.ham:hover { border-color: var(--accent); }
-.ham span { display: block; width: 15px; height: 2px; background: var(--text); border-radius: 2px; }
-
+.ham:hover { border-color:var(--accent); }
 .h-logo {
-  width: 28px; height: 28px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 7px; display: flex; align-items: center;
-  justify-content: center; font-weight: 800; font-size: 10px;
-  color: #000; box-shadow: 0 0 10px var(--accentglow);
+  width:28px; height:28px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:7px; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:10px; color:#000;
+  box-shadow:0 0 10px var(--accentglow); flex-shrink:0;
 }
 .h-title {
-  font-size: 0.95rem; font-weight: 700;
-  background: linear-gradient(90deg, var(--accent), var(--text));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  font-size:.93rem; font-weight:700;
+  background:linear-gradient(90deg,var(--accent),var(--text));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-.h-nsfw {
-  font-size: 0.58rem; font-family: 'Fira Code', monospace;
-  background: #ff4466; color: white; padding: 2px 7px;
-  border-radius: 9px; font-weight: 700; display: none;
+.h-topic {
+  font-size:.62rem; color:var(--muted); font-family:'Fira Code',monospace;
+  background:var(--surface2); border:1px solid var(--border);
+  padding:2px 8px; border-radius:9px;
+  max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  display:flex; align-items:center; gap:4px;
 }
-.h-nsfw.show { display: block; }
+.h-topic svg { flex-shrink:0; }
 .h-model {
-  margin-left: auto; font-family: 'Fira Code', monospace;
-  font-size: 0.58rem; color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-  padding: 3px 9px; border-radius: 18px;
+  margin-left:auto; font-family:'Fira Code',monospace;
+  font-size:.57rem; color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+  padding:3px 9px; border-radius:18px; white-space:nowrap;
 }
 
+/* MESSAGES */
 .messages {
-  flex: 1; overflow-y: auto;
-  padding: 18px 14px 10px;
-  display: flex; flex-direction: column; gap: 16px;
-  scroll-behavior: smooth;
+  flex:1; overflow-y:auto;
+  padding:16px 12px 8px;
+  display:flex; flex-direction:column; gap:13px;
+  scroll-behavior:smooth;
 }
-.messages::-webkit-scrollbar { width: 3px; }
-.messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.messages::-webkit-scrollbar { width:3px; }
+.messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
-.message {
-  display: flex; gap: 9px;
-  animation: msgIn 0.25s ease forwards; opacity: 0;
-}
-@keyframes msgIn {
-  from { opacity:0; transform: translateY(7px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-.message.user { flex-direction: row-reverse; }
+.message { display:flex; gap:8px; animation:msgIn .22s ease forwards; opacity:0; }
+@keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.message.user { flex-direction:row-reverse; }
 
 .av {
-  width: 29px; height: 29px; border-radius: 7px;
-  flex-shrink: 0; display: flex; align-items: center;
-  justify-content: center; font-size: 10px; font-weight: 800; margin-top: 2px;
+  width:28px; height:28px; border-radius:7px;
+  flex-shrink:0; display:flex; align-items:center;
+  justify-content:center; margin-top:2px;
 }
 .message.ai .av {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #000; box-shadow: 0 0 10px var(--accentglow);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 0 10px var(--accentglow);
 }
-.message.user .av { background: var(--surface2); border: 1px solid var(--border); font-size: 14px; }
+.message.user .av { background:var(--surface2); border:1px solid var(--border); }
+
+.bub-wrap { display:flex; flex-direction:column; gap:4px; max-width:min(80%,560px); }
+.message.user .bub-wrap { align-items:flex-end; }
 
 .bub {
-  max-width: min(80%, 560px); padding: 10px 14px;
-  font-size: 0.87rem; line-height: 1.7;
-  white-space: pre-wrap; word-break: break-word;
+  padding:10px 14px; font-size:.875rem;
+  line-height:1.72; white-space:pre-wrap; word-break:break-word;
 }
 .message.ai .bub {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 4px 13px 13px 13px; color: var(--text);
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:4px 13px 13px 13px; color:var(--text);
 }
 .message.user .bub {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
-  border-radius: 13px 4px 13px 13px; color: var(--text);
+  background:color-mix(in srgb,var(--accent) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+  border-radius:13px 4px 13px 13px; color:var(--text);
 }
+
+.msg-actions { display:flex; gap:4px; opacity:0; transition:opacity .2s; }
+.message:hover .msg-actions { opacity:1; }
+.msg-act-btn {
+  background:var(--surface2); border:1px solid var(--border);
+  color:var(--muted); font-size:.6rem; font-family:'Fira Code',monospace;
+  padding:3px 8px; border-radius:6px; cursor:pointer; transition:all .15s;
+  display:flex; align-items:center; gap:4px;
+}
+.msg-act-btn:hover { color:var(--accent); border-color:var(--accent); }
+.msg-act-btn svg { flex-shrink:0; }
 
 .typing-bub {
-  background: var(--surface); border: 1px solid var(--border);
-  padding: 13px 15px; border-radius: 4px 13px 13px 13px;
-  display: flex; gap: 5px; align-items: center;
+  background:var(--surface); border:1px solid var(--border);
+  padding:13px 15px; border-radius:4px 13px 13px 13px;
+  display:flex; gap:5px; align-items:center;
 }
 .typing-bub span {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent); animation: bop 1.2s infinite; opacity: 0.4;
+  width:6px; height:6px; border-radius:50%;
+  background:var(--accent); animation:bop 1.2s infinite; opacity:.4;
 }
-.typing-bub span:nth-child(2) { animation-delay: 0.2s; }
-.typing-bub span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bop {
-  0%,60%,100% { transform: translateY(0); opacity:0.3; }
-  30% { transform: translateY(-6px); opacity:1; }
-}
+.typing-bub span:nth-child(2){animation-delay:.2s}
+.typing-bub span:nth-child(3){animation-delay:.4s}
+@keyframes bop { 0%,60%,100%{transform:translateY(0);opacity:.3} 30%{transform:translateY(-6px);opacity:1} }
 
+/* WELCOME */
 .welcome {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 28px 18px; gap: 11px;
-  animation: msgIn 0.5s 0.1s ease forwards; opacity: 0;
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:28px 18px; gap:10px;
+  animation:msgIn .5s .1s ease forwards; opacity:0;
 }
 .w-logo {
-  width: 68px; height: 68px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 18px; display: flex; align-items: center;
-  justify-content: center; font-weight: 800; font-size: 20px;
-  color: #000; box-shadow: 0 0 46px var(--accentglow); margin-bottom: 6px;
+  width:64px; height:64px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:18px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 44px var(--accentglow); margin-bottom:6px;
 }
 .welcome h2 {
-  font-size: 1.4rem; font-weight: 800; letter-spacing: -0.04em;
-  background: linear-gradient(135deg, var(--accent), var(--text));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  font-size:1.35rem; font-weight:800; letter-spacing:-.04em;
+  background:linear-gradient(135deg,var(--accent),var(--text));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-.welcome p { font-size: 0.8rem; color: var(--muted); max-width: 270px; line-height: 1.65; }
+.welcome p { font-size:.79rem; color:var(--muted); max-width:265px; line-height:1.65; }
 .w-date {
-  font-size: 0.66rem; color: var(--muted); font-family: 'Fira Code', monospace;
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: 3px 11px; border-radius: 18px;
+  font-size:.64rem; color:var(--muted); font-family:'Fira Code',monospace;
+  background:var(--surface2); border:1px solid var(--border);
+  padding:3px 11px; border-radius:18px; display:flex; align-items:center; gap:5px;
 }
-.chips {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  justify-content: center; margin-top: 6px;
-}
+.chips { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:6px; }
 .chip {
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--muted); font-size: 0.75rem; font-family: 'Outfit', sans-serif;
-  padding: 6px 12px; border-radius: 18px; cursor: pointer; transition: all 0.2s;
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--muted); font-size:.74rem; font-family:'Outfit',sans-serif;
+  padding:6px 12px; border-radius:18px; cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; gap:5px;
 }
-.chip:hover {
-  border-color: var(--accent); color: var(--text);
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
-}
+.chip:hover { border-color:var(--accent); color:var(--text); background:color-mix(in srgb,var(--accent) 7%,transparent); }
 
-.sys-msg {
-  text-align: center; font-size: 0.68rem;
-  color: var(--muted); font-family: 'Fira Code', monospace; padding: 3px;
-}
+.sys-msg { text-align:center; font-size:.66rem; color:var(--muted); font-family:'Fira Code',monospace; padding:3px; }
 
 /* INPUT */
 .input-area {
-  padding: 10px 14px 14px;
-  background: color-mix(in srgb, var(--bg) 93%, transparent);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid var(--border); flex-shrink: 0;
+  padding:9px 12px 13px;
+  background:color-mix(in srgb,var(--bg) 93%,transparent);
+  backdrop-filter:blur(14px); border-top:1px solid var(--border); flex-shrink:0;
 }
-.input-row { display: flex; gap: 8px; align-items: flex-end; }
+.suggest-bar {
+  display:flex; gap:5px; overflow-x:auto; margin-bottom:7px; padding-bottom:1px;
+}
+.suggest-bar::-webkit-scrollbar { height:2px; }
+.suggest-bar::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.sug-pill {
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--muted); font-size:.69rem; font-family:'Outfit',sans-serif;
+  padding:4px 10px; border-radius:14px; cursor:pointer; white-space:nowrap;
+  transition:all .15s; flex-shrink:0; display:flex; align-items:center; gap:4px;
+}
+.sug-pill:hover { border-color:var(--accent); color:var(--text); }
+
+.input-row { display:flex; gap:8px; align-items:flex-end; }
 textarea {
-  flex: 1; background: var(--surface); border: 1px solid var(--border);
-  color: var(--text); font-family: 'Outfit', sans-serif;
-  font-size: 0.875rem; padding: 11px 14px; border-radius: 12px;
-  outline: none; resize: none; min-height: 44px; max-height: 120px;
-  line-height: 1.55; transition: border-color 0.2s;
+  flex:1; background:var(--surface); border:1px solid var(--border);
+  color:var(--text); font-family:'Outfit',sans-serif;
+  font-size:.875rem; padding:11px 13px; border-radius:12px;
+  outline:none; resize:none; min-height:44px; max-height:120px;
+  line-height:1.55; transition:border-color .2s;
 }
-textarea:focus { border-color: var(--accent); }
-textarea::placeholder { color: var(--muted); }
+textarea:focus { border-color:var(--accent); }
+textarea::placeholder { color:var(--muted); }
 .send {
-  width: 44px; height: 44px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border: none; border-radius: 12px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; color: #000; flex-shrink: 0; transition: all 0.2s;
-  box-shadow: 0 0 16px var(--accentglow);
+  width:44px; height:44px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none; border-radius:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:#000; flex-shrink:0; transition:all .2s;
+  box-shadow:0 0 16px var(--accentglow);
 }
-.send:hover { transform: scale(1.06); }
-.send:active { transform: scale(0.97); }
-.send:disabled { opacity: 0.3; transform: none; cursor: not-allowed; }
-.input-foot {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-top: 6px;
-}
-.hint { font-size: 0.63rem; color: var(--muted); font-family: 'Fira Code', monospace; }
-.cr { font-size: 0.6rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+.send:hover { transform:scale(1.06); }
+.send:active { transform:scale(.97); }
+.send:disabled { opacity:.3; transform:none; cursor:not-allowed; }
+
+.input-foot { display:flex; align-items:center; justify-content:space-between; margin-top:5px; }
+.hint { font-size:.61rem; color:var(--muted); font-family:'Fira Code',monospace; }
+.cr { font-size:.59rem; color:var(--muted); font-family:'Fira Code',monospace; }
 .err {
-  color: #ff6b6b; font-size: 0.7rem; font-family: 'Fira Code', monospace;
-  margin-top: 5px; padding: 5px 9px;
-  background: rgba(255,107,107,0.07); border-radius: 6px;
-  border: 1px solid rgba(255,107,107,0.14);
+  color:#ff6b6b; font-size:.7rem; font-family:'Fira Code',monospace;
+  margin-top:5px; padding:5px 9px;
+  background:rgba(255,107,107,.07); border-radius:6px;
+  border:1px solid rgba(255,107,107,.14);
 }
+
+body.fs-sm .bub { font-size:.8rem; }
+body.fs-lg .bub { font-size:1rem; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:76px; left:50%; transform:translateX(-50%) translateY(16px);
+  background:var(--surface2); border:1px solid var(--accent); color:var(--text);
+  font-size:.73rem; font-family:'Fira Code',monospace;
+  padding:7px 15px; border-radius:20px; z-index:99;
+  opacity:0; transition:all .3s; pointer-events:none; white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
 <div class="overlay" id="overlay" onclick="closeSB()"></div>
+<div class="toast" id="toast"></div>
 
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sb-head">
     <div class="sb-logo">CX</div>
     <span class="sb-title">CoreXT AI</span>
-    <button class="sb-close" onclick="closeSB()">✕</button>
+    <button class="sb-close" onclick="closeSB()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
 
   <div class="sb-body">
-    <div class="sb-section">
-      <div class="sb-label">Konular</div>
-      <button class="topic-btn" onclick="setTopic('Genel sohbet, her konuda yardım et.')"><span class="ic">💬</span> Genel Sohbet</button>
-      <button class="topic-btn" onclick="setTopic('Kod yazma, debug ve programlama konularında yardım et.')"><span class="ic">💻</span> Kod & Programlama</button>
-      <button class="topic-btn" onclick="setTopic('Matematik sorularını adım adım çöz.')"><span class="ic">🔢</span> Matematik</button>
-      <button class="topic-btn" onclick="setTopic('İngilizce öğret ve pratik yap. Hataları düzelt.')"><span class="ic">🌍</span> Dil & İngilizce</button>
-      <button class="topic-btn" onclick="setTopic('Yaratıcı hikayeler, şiirler ve yazılar yaz.')"><span class="ic">✍️</span> Yaratıcı Yazarlık</button>
-      <button class="topic-btn" onclick="setTopic('Oyunlar, anime, film ve dizi hakkında konuş.')"><span class="ic">🎮</span> Oyun & Eğlence</button>
-      <button class="topic-btn" onclick="setTopic('Sağlık ve fitness konularında genel bilgi ver.')"><span class="ic">🏋️</span> Sağlık & Fitness</button>
-      <button class="topic-btn" onclick="setTopic('Tarih, bilim, felsefe ve genel kültür bilgisi ver.')"><span class="ic">📚</span> Bilgi & Kültür</button>
-      <button class="topic-btn" onclick="setTopic('Fıkra ve şaka üret, eğlenceli ol.')"><span class="ic">😄</span> Eğlence & Şaka</button>
-      <button class="topic-btn" onclick="setTopic('Astroloji ve burç analizleri yap.')"><span class="ic">⭐</span> Astroloji & Burçlar</button>
-      <button class="topic-btn" onclick="setTopic('Yemek tarifleri ve pişirme ipuçları ver.')"><span class="ic">🍳</span> Yemek & Tarifler</button>
-      <button class="topic-btn" onclick="setTopic('Seyahat önerileri ve rehberlik yap.')"><span class="ic">✈️</span> Seyahat</button>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">Konular</div>
+
+      <button class="topic-btn active" id="topic-genel" onclick="setTopic('genel','Genel','Genel sohbet, her konuda yardım et.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Genel Sohbet
+      </button>
+
+      <button class="topic-btn" id="topic-kod" onclick="setTopic('kod','Kod','Kod yazma, debug ve programlama konularında yardım et.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='16 18 22 12 16 6'/><polyline points='8 6 2 12 8 18'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Kod & Programlama
+      </button>
+
+      <button class="topic-btn" id="topic-mat" onclick="setTopic('mat','Matematik','Matematik sorularını adım adım açıkla ve çöz.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='20' x2='12' y2='10'/><line x1='18' y1='20' x2='18' y2='4'/><line x1='6' y1='20' x2='6' y2='16'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        Matematik
+      </button>
+
+      <button class="topic-btn" id="topic-dil" onclick="setTopic('dil','Dil','İngilizce öğret, pratik yap. Hataları kibarca düzelt.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='2' y1='12' x2='22' y2='12'/><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Dil & İngilizce
+      </button>
+
+      <button class="topic-btn" id="topic-yazi" onclick="setTopic('yazi','Yazarlık','Yaratıcı hikayeler, şiirler ve senaryolar yaz.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Yaratıcı Yazarlık
+      </button>
+
+      <button class="topic-btn" id="topic-oyun" onclick="setTopic('oyun','Oyun','Oyunlar, anime, film ve dizi hakkında konuş.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M6 12h4m-2-2v4'/><circle cx='16' cy='10' r='1' fill='currentColor'/><circle cx='18' cy='12' r='1' fill='currentColor'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4"/><circle cx="16" cy="10" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/></svg>
+        Oyun & Eğlence
+      </button>
+
+      <button class="topic-btn" id="topic-saglik" onclick="setTopic('saglik','Sağlık','Sağlık, fitness ve beslenme konularında genel bilgi ver.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Sağlık & Fitness
+      </button>
+
+      <button class="topic-btn" id="topic-bilim" onclick="setTopic('bilim','Bilim','Bilim, tarih, felsefe ve genel kültür hakkında bilgi ver.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+        Bilim & Kültür
+      </button>
+
+      <button class="topic-btn" id="topic-yemek" onclick="setTopic('yemek','Yemek','Yemek tarifleri, malzemeler ve pişirme ipuçları ver.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2'/><path d='M7 2v20'/><path d='M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+        Yemek & Tarifler
+      </button>
+
+      <button class="topic-btn" id="topic-seyahat" onclick="setTopic('seyahat','Seyahat','Seyahat önerileri, gezi rehberleri ve kültürel bilgiler ver.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-1 0-2 1-3.5 2.5L8.8 8H4l-2 2 6.4 2.4 1 3.6-3.4-1.6-2 .6L6 21l2.6-1.8 3.6-1L14.4 24l2-.6-.4-3.4z'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-1 0-2 1-3.5 2.5L8.8 8H4l-2 2 6.4 2.4 1 3.6-3.4-1.6-2 .6L6 21l2.6-1.8 3.6-1L14.4 24l2-.6-.4-3.4z"/></svg>
+        Seyahat
+      </button>
+
+      <button class="topic-btn" id="topic-psikoloji" onclick="setTopic('psikoloji','Psikoloji','Psikoloji, motivasyon ve kişisel gelişim konularında destek ver.',`<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/><line x1='12' y1='17' x2='12.01' y2='17'/><circle cx='12' cy='12' r='10'/></svg>`)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+        Psikoloji & Motivasyon
+      </button>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-label">İçerik Modu</div>
-      <div class="nsfw-row">
-        <div class="nsfw-info">
-          <div class="nsfw-name">🔞 NSFW <span class="nsfw-tag" id="nsfwTag">AÇIK</span></div>
-          <div class="nsfw-sub">Yetişkin içeriği etkinleştirir</div>
+    <!-- Ayarlar -->
+    <div class="sb-sec">
+      <div class="sb-lbl">Ayarlar</div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <div>
+            <div class="setting-label">Sesli Yanıt</div>
+            <div class="setting-sub">Cevapları sesli oku</div>
+          </div>
         </div>
-        <button class="toggle" id="nsfwTgl" onclick="toggleNSFW()"></button>
+        <button class="toggle" id="tglTts" onclick="toggleTts()"></button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <div class="setting-label">Akıllı Öneriler</div>
+            <div class="setting-sub">Hızlı soru önerileri</div>
+          </div>
+        </div>
+        <button class="toggle on" id="tglSug" onclick="toggleSug()"></button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
+          <div>
+            <div class="setting-label">Enter ile Gönder</div>
+            <div class="setting-sub">Shift+Enter yeni satır</div>
+          </div>
+        </div>
+        <button class="toggle on" id="tglEnter" onclick="toggleEnter()"></button>
       </div>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-label">Renk Teması</div>
+    <!-- Tema -->
+    <div class="sb-sec">
+      <div class="sb-lbl">Renk Teması</div>
       <div class="theme-grid">
-        <div class="tdot active" data-c="cyan"   onclick="setAccent('cyan')"></div>
-        <div class="tdot"        data-c="red"    onclick="setAccent('red')"></div>
-        <div class="tdot"        data-c="green"  onclick="setAccent('green')"></div>
-        <div class="tdot"        data-c="orange" onclick="setAccent('orange')"></div>
+        <div class="tdot active" data-c="cyan"   onclick="setAccent('cyan')"   title="Cyan"></div>
+        <div class="tdot"        data-c="red"    onclick="setAccent('red')"    title="Kırmızı"></div>
+        <div class="tdot"        data-c="green"  onclick="setAccent('green')"  title="Yeşil"></div>
+        <div class="tdot"        data-c="orange" onclick="setAccent('orange')" title="Turuncu"></div>
+        <div class="tdot"        data-c="purple" onclick="setAccent('purple')" title="Mor"></div>
       </div>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-label">Görünüm</div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Görünüm</div>
       <div class="mode-row">
-        <button class="mode-btn active" id="darkBtn" onclick="setMode('dark')">🌙 Koyu</button>
-        <button class="mode-btn" id="lightBtn" onclick="setMode('light')">☀️ Açık</button>
+        <button class="mode-btn active" id="darkBtn" onclick="setMode('dark')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Koyu
+        </button>
+        <button class="mode-btn" id="lightBtn" onclick="setMode('light')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          Açık
+        </button>
       </div>
     </div>
 
-    <button class="clear-btn" onclick="clearChat()">🗑️ Sohbeti Temizle</button>
+    <div class="sb-sec">
+      <div class="sb-lbl">Yazı Boyutu</div>
+      <div class="font-row">
+        <button class="font-btn" onclick="setFont('sm',this)">Küçük</button>
+        <button class="font-btn active" onclick="setFont('md',this)">Normal</button>
+        <button class="font-btn" onclick="setFont('lg',this)">Büyük</button>
+      </div>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="sb-sec">
+      <div class="sb-lbl">İstatistikler</div>
+      <div class="stats-box">
+        <div class="stat-row"><span class="stat-label">Toplam mesaj</span><span class="stat-val" id="statMsgs">0</span></div>
+        <div class="stat-row"><span class="stat-label">AI yanıtı</span><span class="stat-val" id="statAi">0</span></div>
+        <div class="stat-row"><span class="stat-label">Aktif konu</span><span class="stat-val" id="statTopic">Genel</span></div>
+        <div class="stat-row"><span class="stat-label">Oturum süresi</span><span class="stat-val" id="statTime">00:00</span></div>
+      </div>
+    </div>
+
+    <button class="action-btn" onclick="exportChat()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Sohbeti İndir (.txt)
+    </button>
+
+    <button class="action-btn danger" onclick="clearChat()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Sohbeti Temizle
+    </button>
   </div>
 
   <div class="sb-footer">
@@ -438,39 +559,44 @@ textarea::placeholder { color: var(--muted); }
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
   <header>
     <button class="ham" onclick="openSB()">
-      <span></span><span></span><span></span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="h-logo">CX</div>
     <span class="h-title">CoreXT AI</span>
-    <span class="h-nsfw" id="hNsfw">🔞 NSFW</span>
+    <span class="h-topic" id="hTopic">
+      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Genel
+    </span>
     <span class="h-model">Llama 3.3 · 70B</span>
   </header>
 
   <div class="messages" id="messages">
     <div class="welcome" id="welcome">
-      <div class="w-logo">CX</div>
-      <h2>CoreXT AI'ya Hoş Geldin</h2>
-      <p>Her konuda yardımcıyım. Sol üstteki ☰ menüden konu seç!</p>
-      <div class="w-date" id="wDate">📅 ...</div>
-      <div class="chips">
-        <button class="chip" onclick="fill('Merhaba! Kimsin sen?')">👋 Tanış</button>
-        <button class="chip" onclick="fill('Bana Python öğret')">🐍 Python</button>
-        <button class="chip" onclick="fill('Komik bir şaka anlat')">😄 Şaka</button>
-        <button class="chip" onclick="fill('Kısa bir hikaye yaz')">✍️ Hikaye</button>
-        <button class="chip" onclick="fill('Bana motivasyon ver')">⚡ Motivasyon</button>
-        <button class="chip" onclick="fill('Güncel bir konu hakkında konuşalım')">💬 Sohbet</button>
+      <div class="w-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2l4 4-4 4"/><path d="M22 2l-4 4"/></svg>
       </div>
+      <h2>CoreXT AI'ya Hoş Geldin</h2>
+      <p>Yapay zeka destekli asistanın. Menüden konu seç veya direkt yaz!</p>
+      <div class="w-date" id="wDate">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="wDateTxt">...</span>
+      </div>
+      <div class="chips" id="welcomeChips"></div>
     </div>
   </div>
 
   <div class="input-area">
+    <div class="suggest-bar" id="sugBar"></div>
     <div class="input-row">
       <textarea id="inp" placeholder="Bir şey sor..." rows="1"
         onkeydown="handleKey(event)" oninput="autoRes(this)"></textarea>
-      <button class="send" id="sendBtn" onclick="send()">➤</button>
+      <button class="send" id="sendBtn" onclick="send()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>
     <div id="errDiv"></div>
     <div class="input-foot">
@@ -485,140 +611,284 @@ const API_KEY = '5f088ab5-c4b3-40f4-9730-5fd088c21cc3';
 const API_URL = 'https://api.sambanova.ai/v1/chat/completions';
 const MODEL   = 'Meta-Llama-3.3-70B-Instruct';
 
-let msgs = [], loading = false, nsfw = false, accent = 'cyan', dark = true;
-let topic = 'Genel sohbet, her konuda yardım et.';
+let msgs=[], loading=false, accent='cyan', dark=true;
+let ttsOn=false, sugOn=true, enterSend=true;
+let topicKey='genel', topicLabel='Genel', topicPrompt='Genel sohbet, her konuda yardım et.';
+let msgCount=0, aiCount=0;
+let sessionStart=Date.now();
 
 // Date
-const now = new Date();
-const dateStr = now.toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-document.getElementById('wDate').textContent = '📅 ' + dateStr;
+const now=new Date();
+const dateStr=now.toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('wDateTxt').textContent=dateStr;
+
+// Timer
+setInterval(()=>{
+  const s=Math.floor((Date.now()-sessionStart)/1000);
+  const m=Math.floor(s/60).toString().padStart(2,'0');
+  const sec=(s%60).toString().padStart(2,'0');
+  const el=document.getElementById('statTime');
+  if(el) el.textContent=`${m}:${sec}`;
+},1000);
 
 // Sidebar
 function openSB()  { document.getElementById('sidebar').classList.add('open');  document.getElementById('overlay').classList.add('show'); }
 function closeSB() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
 
-// NSFW
-function toggleNSFW() {
-  nsfw = !nsfw;
-  document.getElementById('nsfwTgl').classList.toggle('on', nsfw);
-  document.getElementById('nsfwTag').classList.toggle('on', nsfw);
-  document.getElementById('hNsfw').classList.toggle('show', nsfw);
+// Toast
+function toast(msg,icon='') {
+  const t=document.getElementById('toast');
+  t.innerHTML=(icon?`<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon}</svg> `:'')+msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);
 }
 
+// Suggestions map
+const sugMap = {
+  genel:    ['Nasılsın?','İlginç bir bilgi ver','Bana yardım et','Ne yapabilirim?'],
+  kod:      ['Bu kodu açıkla','Bug nasıl bulunur?','Python vs JS','API nedir?'],
+  mat:      ['Türev nedir?','Olasılık hesapla','Integral çöz','Pi neden önemli?'],
+  dil:      ['Kelime öğret','Cümle kur','Telaffuz yardımı','Grammar düzelt'],
+  yazi:     ['Hikaye başlat','Şiir yaz','Karakter oluştur','Roman fikri ver'],
+  oyun:     ['Oyun öner','Anime öner','Film öner','Dizi öner'],
+  saglik:   ['Egzersiz planı','Diyet ipuçları','Uyku önerileri','Stres azalt'],
+  bilim:    ['Kara delik nedir?','Evrim açıkla','Quantum mekaniği','Tarihte bugün'],
+  yemek:    ['Hızlı tarif','Kahvaltı fikirleri','Türk yemekleri','Malzeme öner'],
+  seyahat:  ['Türkiye gezi','Ucuz seyahat','İstanbul önerileri','Vize bilgisi'],
+  psikoloji:['Motivasyon ver','Stresle başa çık','Alışkanlık kur','Özgüven geliştir'],
+};
+
+const welcomeChips = [
+  {label:'Merhaba, kimsin?', prompt:'Merhaba! Kimsin sen?'},
+  {label:'Python öğret',     prompt:'Bana Python öğret'},
+  {label:'Şaka anlat',       prompt:'Komik bir şaka anlat'},
+  {label:'Hikaye yaz',       prompt:'Kısa bir hikaye yaz'},
+  {label:'Motivasyon ver',   prompt:'Bana motivasyon ver'},
+  {label:'Öneri ver',        prompt:'Bugün ne yapmalıyım?'},
+];
+
+function buildChips() {
+  const c=document.getElementById('welcomeChips');
+  if(!c) return;
+  c.innerHTML=welcomeChips.map(ch=>`<button class="chip" onclick="fill('${ch.prompt}')">${ch.label}</button>`).join('');
+}
+buildChips();
+
+function updateSugBar(key) {
+  const pills=sugMap[key]||sugMap['genel'];
+  document.getElementById('sugBar').innerHTML=pills.map(p=>
+    `<span class="sug-pill" onclick="fill('${p}')">${p}</span>`
+  ).join('');
+}
+updateSugBar('genel');
+
 // Topic
-function setTopic(t) {
-  topic = t; msgs = []; closeSB();
-  const c = document.getElementById('messages');
-  c.innerHTML = '';
-  const d = document.createElement('div'); d.className = 'sys-msg';
-  d.textContent = '✅ Konu değiştirildi. Yeni sohbet başladı.';
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
+function setTopic(key, label, prompt, iconHtml) {
+  document.querySelectorAll('.topic-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('topic-'+key).classList.add('active');
+  topicKey=key; topicLabel=label; topicPrompt=prompt;
+  document.getElementById('hTopic').innerHTML=(iconHtml||'')+' '+label;
+  document.getElementById('statTopic').textContent=label;
+  msgs=[]; closeSB();
+  const c=document.getElementById('messages'); c.innerHTML='';
+  addSys('Konu değiştirildi: '+label);
+  updateSugBar(key);
+  toast('Konu: '+label,'<polyline points="20 6 9 17 4 12"/>');
+}
+
+// Settings
+function toggleTts() {
+  ttsOn=!ttsOn;
+  document.getElementById('tglTts').classList.toggle('on',ttsOn);
+  toast(ttsOn?'Sesli yanıt açıldı':'Sesli yanıt kapatıldı','<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>');
+}
+function toggleSug() {
+  sugOn=!sugOn;
+  document.getElementById('tglSug').classList.toggle('on',sugOn);
+  document.getElementById('sugBar').style.display=sugOn?'flex':'none';
+  toast(sugOn?'Öneriler açıldı':'Öneriler kapatıldı','<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>');
+}
+function toggleEnter() {
+  enterSend=!enterSend;
+  document.getElementById('tglEnter').classList.toggle('on',enterSend);
+  document.getElementById('inp').placeholder=enterSend?'Bir şey sor...':'Bir şey sor... (Ctrl+Enter ile gönder)';
+  toast(enterSend?'Enter ile gönderme açık':'Ctrl+Enter ile gönderme aktif');
 }
 
 // Accent
 function setAccent(c) {
-  document.querySelectorAll('.tdot').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.tdot').forEach(d=>d.classList.remove('active'));
   document.querySelector(`[data-c="${c}"]`).classList.add('active');
-  accent = c;
-  document.body.removeAttribute('data-accent');
-  document.body.setAttribute('data-accent', c);
-  if (!dark) document.body.setAttribute('data-theme','light');
-  else document.body.removeAttribute('data-theme');
+  accent=c; document.body.setAttribute('data-accent',c);
+  if(!dark) document.body.setAttribute('data-theme','light');
 }
-
-// Mode
 function setMode(m) {
-  dark = m === 'dark';
-  document.getElementById('darkBtn').classList.toggle('active', dark);
-  document.getElementById('lightBtn').classList.toggle('active', !dark);
-  if (!dark) document.body.setAttribute('data-theme','light');
+  dark=m==='dark';
+  document.getElementById('darkBtn').classList.toggle('active',dark);
+  document.getElementById('lightBtn').classList.toggle('active',!dark);
+  if(!dark) document.body.setAttribute('data-theme','light');
   else document.body.removeAttribute('data-theme');
 }
-
-// Clear
-function clearChat() {
-  msgs = [];
-  const c = document.getElementById('messages'); c.innerHTML = '';
-  const w = document.createElement('div'); w.className = 'welcome'; w.id = 'welcome';
-  w.innerHTML = `<div class="w-logo">CX</div><h2>Sohbet Temizlendi</h2>
-    <p>Yeni bir konuşma başlatmaya hazır!</p>
-    <div class="w-date">📅 ${dateStr}</div>
-    <div class="chips">
-      <button class="chip" onclick="fill('Merhaba!')">👋 Merhaba</button>
-      <button class="chip" onclick="fill('Bana Python öğret')">🐍 Python</button>
-      <button class="chip" onclick="fill('Komik bir şaka anlat')">😄 Şaka</button>
-    </div>`;
-  c.appendChild(w); closeSB();
+function setFont(s,btn) {
+  document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.classList.remove('fs-sm','fs-lg');
+  if(s!=='md') document.body.classList.add('fs-'+s);
+  toast('Yazı boyutu değiştirildi');
 }
 
-// Input helpers
+// Clear & Export
+function clearChat() {
+  msgs=[]; msgCount=0; aiCount=0; updateStats();
+  const c=document.getElementById('messages'); c.innerHTML='';
+  const w=document.createElement('div'); w.className='welcome'; w.id='welcome';
+  w.innerHTML=`
+    <div class="w-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2l4 4-4 4"/><path d="M22 2l-4 4"/></svg>
+    </div>
+    <h2>Sohbet Temizlendi</h2>
+    <p>Yeni bir konuşma başlatmaya hazır!</p>
+    <div class="w-date"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>${dateStr}</span></div>
+    <div class="chips" id="welcomeChips"></div>`;
+  c.appendChild(w); buildChips(); closeSB();
+  toast('Sohbet temizlendi','<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>');
+}
+
+function exportChat() {
+  if(!msgs.length){toast('Sohbet boş!'); return;}
+  const lines=[`CoreXT AI — Sohbet Kaydı\nTarih: ${dateStr}\nKonu: ${topicLabel}\n${'─'.repeat(40)}\n`];
+  msgs.forEach(m=>lines.push(`[${m.role==='user'?'Sen':'CoreXT AI'}]\n${m.content}\n`));
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`corext-${Date.now()}.txt`; a.click();
+  toast('Sohbet indirildi','<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>');
+}
+
+function updateStats() {
+  document.getElementById('statMsgs').textContent=msgCount;
+  document.getElementById('statAi').textContent=aiCount;
+}
+
+// Input
 function autoRes(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+function handleKey(e) {
+  if(e.key==='Enter'&&(enterSend?!e.shiftKey:e.ctrlKey)){e.preventDefault();send();}
+}
 function fill(t) { const i=document.getElementById('inp'); i.value=t; autoRes(i); i.focus(); }
 
-// Render helpers
+// Render
+function addSys(txt) {
+  const c=document.getElementById('messages');
+  const d=document.createElement('div'); d.className='sys-msg'; d.textContent=txt;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+
+const copyIcon=`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const regenIcon=`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>`;
+const volIcon=`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+
 function addMsg(role, text) {
-  const w = document.getElementById('welcome'); if(w) w.remove();
-  const c = document.getElementById('messages');
-  const d = document.createElement('div'); d.className=`message ${role}`;
-  const av = document.createElement('div'); av.className='av'; av.textContent = role==='ai'?'CX':'👤';
-  const b = document.createElement('div'); b.className='bub'; b.textContent=text;
-  d.appendChild(av); d.appendChild(b); c.appendChild(d); c.scrollTop=c.scrollHeight;
+  const w=document.getElementById('welcome'); if(w) w.remove();
+  const c=document.getElementById('messages');
+  const d=document.createElement('div'); d.className=`message ${role}`;
+
+  const av=document.createElement('div'); av.className='av';
+  if(role==='ai') {
+    av.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/><path d="M3 9h6"/><path d="M3 15h6"/><path d="M15 3v6"/><path d="M9 3v6"/><path d="M15 15v6"/><path d="M9 15v6"/><path d="M15 9h6"/><path d="M15 15h6"/></svg>`;
+  } else {
+    av.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+  }
+
+  const wrap=document.createElement('div'); wrap.className='bub-wrap';
+  const b=document.createElement('div'); b.className='bub'; b.textContent=text;
+
+  const acts=document.createElement('div'); acts.className='msg-actions';
+
+  if(role==='ai') {
+    // TTS button
+    if(ttsOn) {
+      const ttsBtn=document.createElement('button'); ttsBtn.className='msg-act-btn';
+      ttsBtn.innerHTML=volIcon+' Dinle';
+      ttsBtn.onclick=()=>{
+        const u=new SpeechSynthesisUtterance(text); u.lang='tr-TR'; speechSynthesis.speak(u);
+        ttsBtn.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Dur`;
+        u.onend=()=>ttsBtn.innerHTML=volIcon+' Dinle';
+      };
+      acts.appendChild(ttsBtn);
+    }
+    // Regen button
+    const regenBtn=document.createElement('button'); regenBtn.className='msg-act-btn';
+    regenBtn.innerHTML=regenIcon+' Yenile';
+    regenBtn.onclick=()=>{ msgs.pop(); d.remove(); aiCount--; updateStats(); send(true); };
+    acts.appendChild(regenBtn);
+  }
+
+  // Copy button
+  const copyBtn=document.createElement('button'); copyBtn.className='msg-act-btn';
+  copyBtn.innerHTML=copyIcon+' Kopyala';
+  copyBtn.onclick=()=>{ navigator.clipboard.writeText(text); toast('Kopyalandı','<polyline points="20 6 9 17 4 12"/>'); };
+  acts.appendChild(copyBtn);
+
+  wrap.appendChild(b); wrap.appendChild(acts);
+  d.appendChild(av); d.appendChild(wrap);
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
 
 function showTyping() {
   const w=document.getElementById('welcome'); if(w) w.remove();
   const c=document.getElementById('messages');
   const d=document.createElement('div'); d.className='message ai'; d.id='typing';
-  const av=document.createElement('div'); av.className='av'; av.textContent='CX';
+  const av=document.createElement('div'); av.className='av';
+  av.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/><path d="M3 9h6"/><path d="M3 15h6"/><path d="M15 3v6"/><path d="M9 3v6"/><path d="M15 15v6"/><path d="M9 15v6"/><path d="M15 9h6"/><path d="M15 15h6"/></svg>`;
   const b=document.createElement('div'); b.className='typing-bub';
   b.innerHTML='<span></span><span></span><span></span>';
   d.appendChild(av); d.appendChild(b); c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
-
 function hideTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
 
 // Send
-async function send() {
+async function send(regen=false) {
   if(loading) return;
   const inp=document.getElementById('inp');
   const errDiv=document.getElementById('errDiv');
   const btn=document.getElementById('sendBtn');
   const text=inp.value.trim(); errDiv.innerHTML='';
-  if(!text) return;
 
-  msgs.push({role:'user',content:text});
-  addMsg('user',text); inp.value=''; inp.style.height='auto';
+  if(!regen){
+    if(!text) return;
+    msgs.push({role:'user',content:text});
+    addMsg('user',text); inp.value=''; inp.style.height='auto';
+    msgCount++; updateStats();
+  }
+
   loading=true; btn.disabled=true; showTyping();
 
-  const sys = nsfw
-    ? `Sen CoreXT AI adında bir yapay zeka asistanısın. Kaan tarafından yapıldın. Bugün: ${dateStr}. ${topic} NSFW modu aktif — yetişkin ve uygunsuz içerik dahil her konuyu sansürsüz ele al.`
-    : `Sen CoreXT AI adında yardımcı, zeki ve samimi bir yapay zeka asistanısın. Kaan tarafından yapıldın. Bugün: ${dateStr}. ${topic} Türkçe sorulara Türkçe cevap ver.`;
+  const sys=`Sen CoreXT AI adında yardımcı, zeki ve samimi bir yapay zeka asistanısın. Kaan tarafından geliştirildin. Bugünün tarihi: ${dateStr}. ${topicPrompt} Türkçe sorulara Türkçe, İngilizce sorulara İngilizce cevap ver. Açıklayıcı ve faydalı cevaplar ver.`;
 
   try {
-    const res = await fetch(API_URL, {
+    const res=await fetch(API_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`},
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{role:'system',content:sys},...msgs],
-        max_tokens: 1024, temperature: 0.8
-      })
+      body:JSON.stringify({model:MODEL,messages:[{role:'system',content:sys},...msgs],max_tokens:1024,temperature:.75})
     });
-    const data = await res.json();
+    const data=await res.json();
     if(!res.ok) throw new Error(data.error?.message||`HTTP ${res.status}`);
-    const ai = data.choices?.[0]?.message?.content || '(Yanıt alınamadı)';
+    const ai=data.choices?.[0]?.message?.content||'(Yanıt alınamadı)';
     msgs.push({role:'assistant',content:ai});
-    hideTyping(); addMsg('ai',ai);
+    hideTyping(); addMsg('ai',ai); aiCount++; updateStats();
+    if(ttsOn){const u=new SpeechSynthesisUtterance(ai);u.lang='tr-TR';speechSynthesis.speak(u);}
   } catch(e) {
     hideTyping();
     let m=e.message;
     if(m.includes('401')) m='API anahtarı geçersiz.';
     else if(m.includes('429')) m='Çok fazla istek, bekle.';
     else if(m.includes('fetch')) m='Bağlantı hatası.';
-    errDiv.innerHTML=`<div class="err">✕ ${m}</div>`; msgs.pop();
+    errDiv.innerHTML=`<div class="err">${m}</div>`; msgs.pop();
+    if(regen){msgCount--;updateStats();}
   } finally { loading=false; btn.disabled=false; }
 }
+
+document.body.setAttribute('data-accent','cyan');
+updateStats();
 </script>
 </body>
 </html>
