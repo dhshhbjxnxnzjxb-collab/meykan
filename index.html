@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoreXT AI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #00d4ff;
+    --accent2: #0099cc;
+    --text: #e2e0f0;
+    --muted: #6b6880;
+    --ai-bg: #0f0f1a;
+    --glow: rgba(0, 212, 255, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 60% 20%, rgba(0,212,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(0,153,204,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    width: 100%; max-width: 780px;
+    height: 100vh;
+    display: flex; flex-direction: column;
+    position: relative; z-index: 1;
+  }
+
+  header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(14px);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800;
+    color: #000;
+    box-shadow: 0 0 24px var(--glow);
+    letter-spacing: -1px;
+  }
+
+  header h1 {
+    font-size: 1.15rem; font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(90deg, var(--accent), #fff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .model-badge {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 3px 10px; border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .messages {
+    flex: 1; overflow-y: auto;
+    padding: 24px 24px 12px;
+    display: flex; flex-direction: column; gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .message {
+    display: flex; gap: 12px;
+    animation: fadeSlideIn 0.3s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 8px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; margin-top: 2px;
+  }
+
+  .message.ai .avatar {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000;
+    box-shadow: 0 0 12px var(--glow);
+  }
+
+  .message.user .avatar {
+    background: #1a1a2e;
+    border: 1px solid var(--border);
+  }
+
+  .bubble {
+    max-width: 78%; padding: 12px 16px;
+    font-size: 0.88rem; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  .message.ai .bubble {
+    background: var(--ai-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px 14px 14px 14px;
+  }
+
+  .message.user .bubble {
+    background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(0,153,204,0.08));
+    border: 1px solid rgba(0,212,255,0.2);
+    color: var(--text);
+    border-radius: 14px 4px 14px 14px;
+  }
+
+  .typing-bubble {
+    background: var(--ai-bg); border: 1px solid var(--border);
+    padding: 14px 18px; border-radius: 4px 14px 14px 14px;
+    display: flex; gap: 5px; align-items: center;
+  }
+
+  .typing-bubble span {
+    width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    animation: bounce 1.2s infinite; opacity: 0.5;
+  }
+
+  .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .welcome {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 40px; gap: 14px;
+    opacity: 0; animation: fadeSlideIn 0.5s 0.1s ease forwards;
+  }
+
+  .welcome-icon {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #000;
+    box-shadow: 0 0 50px var(--glow);
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+  }
+
+  .welcome h2 {
+    font-size: 1.6rem; font-weight: 800; letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--accent), #fff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .welcome p { font-size: 0.83rem; color: var(--muted); max-width: 280px; line-height: 1.65; }
+
+  .suggestions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-top: 10px;
+  }
+
+  .suggestion {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.77rem;
+    font-family: 'Syne', sans-serif;
+    padding: 7px 14px; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .suggestion:hover {
+    border-color: var(--accent); color: var(--text);
+    background: rgba(0,212,255,0.06);
+  }
+
+  .input-area {
+    padding: 14px 24px 18px;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+
+  textarea {
+    flex: 1; background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: 0.88rem; padding: 12px 16px; border-radius: 12px;
+    outline: none; resize: none;
+    min-height: 46px; max-height: 140px;
+    line-height: 1.5; transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #000; flex-shrink: 0;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(0,212,255,0.3);
+  }
+
+  .send-btn:hover { transform: scale(1.06); box-shadow: 0 0 30px rgba(0,212,255,0.5); }
+  .send-btn:active { transform: scale(0.97); }
+  .send-btn:disabled { opacity: 0.35; transform: none; cursor: not-allowed; }
+
+  .bottom-row {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-top: 8px;
+  }
+
+  .hint { font-size: 0.67rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  .clear-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; padding: 4px 12px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .clear-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .error-msg {
+    color: #f87171; font-size: 0.74rem;
+    font-family: 'DM Mono', monospace;
+    margin-top: 7px; padding: 6px 10px;
+    background: rgba(248,113,113,0.07); border-radius: 6px;
+    border: 1px solid rgba(248,113,113,0.15);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">CX</div>
+    <h1>CoreXT AI</h1>
+    <span class="model-badge">Llama 3.3 · 70B</span>
+  </header>
+
+  <div class="messages" id="messages">
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">CX</div>
+      <h2>CoreXT AI'ya Hoş Geldin</h2>
+      <p>Sana her konuda yardımcı olmaya hazırım. Ne öğrenmek ya da yapmak istiyorsun?</p>
+      <div class="suggestions">
+        <button class="suggestion" onclick="fillSuggestion('Bana Python öğret')">Python öğret 🐍</button>
+        <button class="suggestion" onclick="fillSuggestion('Bir hikaye yaz')">Hikaye yaz 📖</button>
+        <button class="suggestion" onclick="fillSuggestion('Matematik sorusunu çöz')">Matematik 🔢</button>
+        <button class="suggestion" onclick="fillSuggestion('Kod yazma konusunda yardım et')">Kod yardımı 💻</button>
+        <button class="suggestion" onclick="fillSuggestion('İngilizce pratik yapmak istiyorum')">İngilizce 🌍</button>
+        <button class="suggestion" onclick="fillSuggestion('Bana bir şaka anlat')">Şaka 😄</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="userInput" placeholder="CoreXT'e bir şey sor..." rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+    <div id="errorMsg"></div>
+    <div class="bottom-row">
+      <span class="hint">Enter → gönder &nbsp;·&nbsp; Shift+Enter → yeni satır</span>
+      <button class="clear-btn" onclick="clearChat()">Sohbeti Temizle</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_KEY = '5f088ab5-c4b3-40f4-9730-5fd088c21cc3';
+  const API_URL = 'https://api.sambanova.ai/v1/chat/completions';
+  const MODEL = 'Meta-Llama-3.3-70B-Instruct';
+
+  let messages = [];
+  let isLoading = false;
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function fillSuggestion(text) {
+    const input = document.getElementById('userInput');
+    input.value = text;
+    autoResize(input);
+    input.focus();
+  }
+
+  function clearChat() {
+    messages = [];
+    const container = document.getElementById('messages');
+    container.innerHTML = '';
+    const welcome = document.createElement('div');
+    welcome.className = 'welcome'; welcome.id = 'welcome';
+    welcome.innerHTML = `
+      <div class="welcome-icon">CX</div>
+      <h2>CoreXT AI'ya Hoş Geldin</h2>
+      <p>Sana her konuda yardımcı olmaya hazırım.</p>
+      <div class="suggestions">
+        <button class="suggestion" onclick="fillSuggestion('Bana Python öğret')">Python öğret 🐍</button>
+        <button class="suggestion" onclick="fillSuggestion('Bir hikaye yaz')">Hikaye yaz 📖</button>
+        <button class="suggestion" onclick="fillSuggestion('Matematik sorusunu çöz')">Matematik 🔢</button>
+        <button class="suggestion" onclick="fillSuggestion('Kod yazma konusunda yardım et')">Kod yardımı 💻</button>
+      </div>`;
+    container.appendChild(welcome);
+    document.getElementById('errorMsg').innerHTML = '';
+  }
+
+  function addMessage(role, text) {
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'ai' ? 'CX' : '👤';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function showTyping() {
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'message ai'; div.id = 'typing';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar'; avatar.textContent = 'CX';
+    const bubble = document.createElement('div');
+    bubble.className = 'typing-bubble';
+    bubble.innerHTML = '<span></span><span></span><span></span>';
+    div.appendChild(avatar); div.appendChild(bubble);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+  }
+
+  async function sendMessage() {
+    if (isLoading) return;
+
+    const input = document.getElementById('userInput');
+    const errorDiv = document.getElementById('errorMsg');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const text = input.value.trim();
+    errorDiv.innerHTML = '';
+    if (!text) return;
+
+    messages.push({ role: 'user', content: text });
+    addMessage('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+
+    isLoading = true;
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: 'Sen CoreXT AI adında yardımcı, zeki ve samimi bir yapay zeka asistanısın. Türkçe sorulara Türkçe cevap ver. Net ve anlaşılır ol.' },
+            ...messages
+          ],
+          max_tokens: 1024,
+          temperature: 0.7
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);
+
+      const aiText = data.choices?.[0]?.message?.content || '(Yanıt alınamadı)';
+      messages.push({ role: 'assistant', content: aiText });
+      removeTyping();
+      addMessage('ai', aiText);
+
+    } catch (err) {
+      removeTyping();
+      let msg = err.message;
+      if (msg.includes('401')) msg = 'API anahtarı geçersiz.';
+      else if (msg.includes('429')) msg = 'Çok fazla istek, biraz bekle.';
+      else if (msg.includes('Failed to fetch')) msg = 'Bağlantı hatası. Sayfayı yenile veya internet bağlantını kontrol et.';
+      errorDiv.innerHTML = `<div class="error-msg">✕ ${msg}</div>`;
+      messages.pop();
+    } finally {
+      isLoading = false;
+      sendBtn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
