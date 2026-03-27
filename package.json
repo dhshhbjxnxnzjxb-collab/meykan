@@ -1,7 +1,7 @@
 {
   "name": "barisma-portali",
   "version": "1.0.0",
-  "description": "Socket.IO ile gerçek zamanlı barışma ve mesajlaşma uygulaması",
+  "description": "IP tabanlı barışma ve mesajlaşma uygulaması",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
