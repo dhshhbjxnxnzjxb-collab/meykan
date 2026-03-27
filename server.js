@@ -3,6 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,149 +17,106 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ana sayfa route'u
+// HEDEF IP (MESAJ BEKLEYEN KİŞİ - SEN)
+const TARGET_IP = '151.250.6.36';
+
+// Kullanıcıları sakla
+const userSockets = new Map();
+const ipToSocket = new Map();
+
+// Offline mesajlar için dosya
+const OFFLINE_FILE = path.join(__dirname, 'offline_messages.json');
+if (!fs.existsSync(OFFLINE_FILE)) {
+  fs.writeFileSync(OFFLINE_FILE, JSON.stringify([]));
+}
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Kullanıcıların IP'lerini sakla
-const userSockets = new Map(); // socketId -> { ip, socket }
-const ipToSocket = new Map(); // ip -> socketId
-
-// HEDEF IP (barışılacak kişinin IP'si)
-const TARGET_IP = '151.250.6.36';
-
-// Ziyaretçinin IP'sini almak için middleware
 app.get('/get-ip', (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  res.json({ ip: ip.replace('::ffff:', '') });
+  let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  ip = ip.replace('::ffff:', '').replace('::1', '127.0.0.1');
+  res.json({ ip: ip, isTarget: ip === TARGET_IP });
 });
 
 io.on('connection', (socket) => {
   console.log('🔌 Yeni bağlantı:', socket.id);
 
   socket.on('register_ip', (ip) => {
-    console.log(`📝 IP kaydedildi: ${ip} -> ${socket.id}`);
+    console.log(`📝 IP kaydedildi: ${ip}`);
     userSockets.set(socket.id, { ip, socket });
     ipToSocket.set(ip, socket.id);
     
-    // Hedef kullanıcıya özel mesaj
-    if (ip === TARGET_IP) {
-      socket.emit('target_user', { 
-        message: 'Sen hedef kullanıcısın! Sevgilinden gelen mesajlar buraya gelecek.',
-        isTarget: true 
-      });
-      console.log('🎯 Hedef kullanıcı bağlandı!');
-    }
+    const isTarget = (ip === TARGET_IP);
+    socket.emit('user_type', { isTarget: isTarget, myIp: ip });
     
-    // Bağlantı durumunu herkese bildir
-    io.emit('user_status', { 
-      ip: ip, 
-      status: 'online',
-      isTarget: ip === TARGET_IP
-    });
+    if (isTarget) {
+      console.log('🎯 HEDEF KULLANICI (SEN) BAĞLANDI!');
+      socket.emit('target_notification', { 
+        message: '💖 Barışma portalına hoş geldin! Sevgilinden gelecek mesajları burada bekliyorsun.' 
+      });
+      
+      // Offline mesajları kontrol et
+      const offlineMessages = JSON.parse(fs.readFileSync(OFFLINE_FILE, 'utf8'));
+      const myMessages = offlineMessages.filter(m => m.targetIP === ip);
+      if (myMessages.length > 0) {
+        myMessages.forEach(msg => {
+          socket.emit('new_message', {
+            message: msg.message,
+            senderIP: msg.senderIP,
+            isOffline: true
+          });
+        });
+        const remaining = offlineMessages.filter(m => m.targetIP !== ip);
+        fs.writeFileSync(OFFLINE_FILE, JSON.stringify(remaining));
+      }
+    }
   });
 
-  // Mesaj gönderme
+  // MESAJ GÖNDER (karşı taraftan gelen)
   socket.on('send_message', (data) => {
     const { targetIP, message, senderIP } = data;
-    console.log(`📨 Mesaj: ${senderIP} -> ${targetIP}: ${message.content}`);
+    console.log(`📨 Mesaj: ${senderIP} -> ${targetIP}`);
     
-    // Hedef IP'ye sahip kullanıcıya mesajı ilet
     const targetSocketId = ipToSocket.get(targetIP);
     
     if (targetSocketId) {
       io.to(targetSocketId).emit('new_message', {
         message: message,
         senderIP: senderIP,
-        targetIP: targetIP
+        timestamp: new Date().toLocaleString('tr-TR')
       });
+      socket.emit('message_sent', { success: true, targetOnline: true });
       console.log(`✅ Mesaj iletildi: ${targetIP}`);
-      
-      // Gönderene onay
-      socket.emit('message_sent', { 
-        success: true, 
-        message: message,
-        targetOnline: true
-      });
     } else {
-      console.log(`⚠️ Hedef IP bulunamadı veya çevrimdışı: ${targetIP}`);
-      
-      // Mesajı bekleme listesine kaydet (offline mesaj)
-      const offlineMessages = JSON.parse(require('fs').readFileSync('./offline_messages.json', 'utf8') || '[]');
+      // Offline kaydet
+      const offlineMessages = JSON.parse(fs.readFileSync(OFFLINE_FILE, 'utf8'));
       offlineMessages.push({
         message: message,
         senderIP: senderIP,
         targetIP: targetIP,
         timestamp: new Date().toISOString()
       });
-      require('fs').writeFileSync('./offline_messages.json', JSON.stringify(offlineMessages));
-      
-      socket.emit('message_sent', { 
-        success: false, 
-        error: 'Hedef kullanıcı çevrimdışı, mesaj kaydedildi',
-        message: message 
-      });
+      fs.writeFileSync(OFFLINE_FILE, JSON.stringify(offlineMessages));
+      socket.emit('message_sent', { success: false, targetOnline: false });
+      console.log(`💾 Mesaj kaydedildi (offline): ${targetIP}`);
     }
   });
 
-  // Yanıt mesajı
-  socket.on('send_reply', (data) => {
-    const { originalSenderIP, replyMessage, senderIP } = data;
-    console.log(`💬 Yanıt: ${senderIP} -> ${originalSenderIP}`);
-    
-    const targetSocketId = ipToSocket.get(originalSenderIP);
-    
-    if (targetSocketId) {
-      io.to(targetSocketId).emit('new_reply', {
-        message: replyMessage,
-        senderIP: senderIP,
-        timestamp: new Date().toLocaleString('tr-TR')
-      });
-      socket.emit('reply_sent', { success: true });
-    } else {
-      socket.emit('reply_sent', { success: false, error: 'Kullanıcı çevrimdışı' });
-    }
-  });
-
-  // Bağlantı kesilme
   socket.on('disconnect', () => {
     const userInfo = userSockets.get(socket.id);
     if (userInfo) {
       console.log(`❌ Bağlantı kesildi: ${userInfo.ip}`);
-      io.emit('user_status', { 
-        ip: userInfo.ip, 
-        status: 'offline',
-        isTarget: userInfo.ip === TARGET_IP
-      });
       ipToSocket.delete(userInfo.ip);
       userSockets.delete(socket.id);
     }
   });
-  
-  // Offline mesajları kontrol et (yeni bağlanan kullanıcıya)
-  const fs = require('fs');
-  if (fs.existsSync('./offline_messages.json')) {
-    const offlineMessages = JSON.parse(fs.readFileSync('./offline_messages.json', 'utf8') || '[]');
-    const userMessages = offlineMessages.filter(m => m.targetIP === socket.handshake.address);
-    userMessages.forEach(msg => {
-      socket.emit('new_message', {
-        message: msg.message,
-        senderIP: msg.senderIP,
-        targetIP: msg.targetIP,
-        isOffline: true
-      });
-    });
-    // Gönderilen mesajları temizle
-    const remaining = offlineMessages.filter(m => !userMessages.includes(m));
-    fs.writeFileSync('./offline_messages.json', JSON.stringify(remaining));
-  }
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`\n🚀 SUNUCU BAŞARIYLA ÇALIŞIYOR!`);
-  console.log(`📍 Adres: http://localhost:${PORT}`);
-  console.log(`🎯 Hedef IP: ${TARGET_IP}`);
-  console.log(`💡 İki farklı tarayıcıda açarak mesajlaşmayı test edebilirsiniz\n`);
+  console.log(`\n🚀 SUNUCU ÇALIŞIYOR: http://localhost:${PORT}`);
+  console.log(`🎯 HEDEF IP (MESAJ BEKLEYEN): ${TARGET_IP}`);
+  console.log(`📌 Bu IP'ye sahip kişi siteye girince SADECE MESAJ BEKLEME EKRANI görür\n`);
 });
