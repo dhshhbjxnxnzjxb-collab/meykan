@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>💖 Barışma Portalı | Yeniden Başlangıç</title>
+    <title>💖 Barışma Portalı</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,25 +19,30 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow-x: hidden;
         }
+        
         .glass-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 40px;
+            padding: 35px;
             width: 100%;
             max-width: 600px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeInUp 0.6s ease-out;
         }
+        
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .peace-letter { text-align: center; margin-bottom: 30px; }
-        .peace-letter h1 {
+        
+        /* MESAJ GÖNDEREN TARAF ARAYÜZÜ */
+        .sender-interface {
+            text-align: center;
+        }
+        
+        .sender-interface h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
@@ -44,39 +50,41 @@
             color: transparent;
             margin-bottom: 20px;
         }
-        .icon-heart-main {
+        
+        .heart-icon {
             font-size: 4rem;
             color: #ff6b6b;
             margin-bottom: 15px;
-            animation: pulseHeart 1.5s ease-in-out infinite;
-            display: inline-block;
+            animation: pulseHeart 1.5s ease infinite;
         }
+        
         @keyframes pulseHeart {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+            50% { transform: scale(1.1); }
         }
-        .letter-content {
+        
+        .letter-box {
             background: linear-gradient(135deg, #fff9f0, #fff5e8);
             padding: 25px;
             border-radius: 24px;
             border-left: 5px solid #ff6b6b;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
+            margin: 20px 0;
+            text-align: left;
         }
-        .letter-content:hover { transform: translateY(-3px); }
-        .letter-content p {
-            font-size: 1rem;
+        
+        .letter-box p {
+            font-size: 0.95rem;
             line-height: 1.7;
             color: #2d3748;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
-        .letter-content .signature {
-            font-style: italic;
+        
+        .letter-box .signature {
             color: #ff6b6b;
             font-weight: 600;
-            font-size: 1.1rem;
             margin-top: 10px;
         }
+        
         .peace-button {
             background: linear-gradient(135deg, #ff6b6b, #ff8787);
             border: none;
@@ -86,44 +94,38 @@
             color: white;
             border-radius: 60px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
-            margin: 25px 0;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            position: relative;
-            overflow: hidden;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
         }
+        
         .peace-button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.4);
         }
-        .message-area {
-            margin-top: 25px;
-            animation: slideDown 0.5s ease-out;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
         .message-input {
             width: 100%;
             padding: 16px;
             border: 2px solid #e2e8f0;
             border-radius: 24px;
-            font-family: 'Inter', sans-serif;
+            font-family: inherit;
             font-size: 1rem;
             resize: vertical;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
+        
         .message-input:focus {
             outline: none;
             border-color: #ff6b6b;
-            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
         }
+        
         .send-button {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
@@ -133,15 +135,50 @@
             cursor: pointer;
             margin-top: 12px;
             font-weight: 600;
-            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s;
         }
+        
         .send-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
+        
+        /* MESAJ BEKLEYEN TARAF ARAYÜZÜ (SEN) */
+        .receiver-interface {
+            text-align: center;
+        }
+        
+        .waiting-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            animation: badgePulse 2s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 107, 107, 0); }
+        }
+        
+        .waiting-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .waiting-title i {
+            color: #ff6b6b;
+            margin-right: 10px;
+        }
+        
         .messages-container {
             margin-top: 25px;
             max-height: 400px;
@@ -149,10 +186,9 @@
             padding: 10px;
             background: #f8fafc;
             border-radius: 24px;
+            margin-bottom: 20px;
         }
-        .messages-container::-webkit-scrollbar { width: 6px; }
-        .messages-container::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        .messages-container::-webkit-scrollbar-thumb { background: #ff6b6b; border-radius: 10px; }
+        
         .message-bubble {
             background: white;
             border-radius: 20px;
@@ -160,67 +196,34 @@
             margin-bottom: 12px;
             border-left: 4px solid #ff6b6b;
             animation: messageSlide 0.3s ease-out;
-            transition: all 0.2s ease;
         }
+        
         @keyframes messageSlide {
             from { opacity: 0; transform: translateX(-15px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
         .message-bubble.own {
             background: linear-gradient(135deg, #667eea08, #764ba208);
             border-left-color: #764ba2;
-            animation: messageSlideRight 0.3s ease-out;
         }
-        @keyframes messageSlideRight {
-            from { opacity: 0; transform: translateX(15px); }
-            to { opacity: 1; transform: translateX(0); }
+        
+        .message-text {
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            word-wrap: break-word;
         }
-        .message-text { color: #2d3748; margin-bottom: 6px; word-wrap: break-word; font-size: 0.95rem; }
-        .message-time { font-size: 0.7rem; color: #a0aec0; display: flex; align-items: center; gap: 6px; }
-        .reply-button {
-            background: none;
-            border: none;
-            color: #ff6b6b;
-            cursor: pointer;
-            font-size: 0.75rem;
-            margin-left: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: #a0aec0;
         }
-        .reply-button:hover { color: #764ba2; transform: scale(1.05); }
-        #fireworks-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1000;
+        
+        .reply-area {
+            margin-top: 15px;
         }
-        .hidden { display: none; }
-        .badge {
-            background: linear-gradient(135deg, #ff6b6b, #ff8787);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            padding: 4px 12px;
-            background: #e2e8f0;
-            border-radius: 20px;
-            margin-bottom: 10px;
-        }
+        
         .ip-info {
             background: #f1f5f9;
             padding: 8px 12px;
@@ -230,60 +233,50 @@
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
         @media (max-width: 640px) {
             .glass-card { padding: 25px; }
-            .peace-letter h1 { font-size: 1.6rem; }
+            .waiting-title { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
     <canvas id="fireworks-canvas"></canvas>
-    <div class="glass-card" id="app">
-        <div id="main-interface">
-            <div class="peace-letter">
-                <i class="fas fa-heart icon-heart-main"></i>
-                <h1><i class="fas fa-envelope-open-text"></i> Barışma Mektubu</h1>
-                <div class="letter-content">
-                    <p><i class="fas fa-user"></i> Sevgilim,</p>
-                    <p><i class="fas fa-cloud-sun"></i> Yaşadığımız iniş çıkışlar, kırgınlıklar ve ayrılıklar bize aslında ne kadar değerli olduğumuzu gösterdi. Her tartışma bizi daha da güçlendirecek, her kırgınlık yerini anlayışa bırakacak.</p>
-                    <p><i class="fas fa-hand-peace"></i> Bugün yeniden başlıyoruz. Kalbimdeki sevgi her zamankinden daha büyük.</p>
-                    <p class="signature"><i class="fas fa-feather-alt"></i> Sonsuza kadar seninle...</p>
-                </div>
-            </div>
-            <div class="ip-info" id="ipDisplay">
-                <i class="fas fa-network-wired"></i> IP adresiniz alınıyor...
-            </div>
-            <button class="peace-button" id="peaceBtn">
-                <i class="fas fa-heartbeat"></i>
-                Barışa Açılan Kalp
-                <i class="fas fa-heart"></i>
-            </button>
-            <div id="messageBox" class="hidden">
-                <textarea id="userMessage" class="message-input" rows="3" placeholder="Sevgiline iletmek istediğin mesajı yaz..."></textarea>
-                <button id="sendMessageBtn" class="send-button">
-                    <i class="fas fa-paper-plane"></i> Mesajı Gönder
-                </button>
-            </div>
-        </div>
-        <div id="chat-interface" class="hidden">
-            <div class="badge">
-                <i class="fas fa-comment-dots"></i> Barışma Mesajları
-                <i class="fas fa-heart" style="font-size: 0.7rem;"></i>
-            </div>
-            <div class="status-indicator" id="connectionStatus">
-                <i class="fas fa-circle"></i> Bağlanıyor...
-            </div>
-            <div class="messages-container" id="messagesList"></div>
-            <div class="message-area">
-                <textarea id="replyMessage" class="message-input" rows="2" placeholder="Cevap yaz..."></textarea>
-                <button id="sendReplyBtn" class="send-button">
-                    <i class="fas fa-reply-all"></i> Yanıtla
-                </button>
-            </div>
-        </div>
-    </div>
+    <div class="glass-card" id="app"></div>
 
     <script>
         const socket = io();
@@ -352,14 +345,19 @@
             }
         }
         
-        async function getUserIP() {
-            try {
-                const response = await fetch('/get-ip');
-                const data = await response.json();
-                return data.ip;
-            } catch (error) {
-                return '127.0.0.1';
-            }
+        function showNotification(message, type = 'info') {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.style.background = type === 'success' ? '#48bb78' : '#ff6b6b';
+            notif.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-heart'}"></i> ${message}`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         function saveMessages() {
@@ -371,97 +369,84 @@
             if (saved) currentMessages = JSON.parse(saved);
         }
         
-        function sendMessage(content) {
-            if (!content.trim()) return false;
-            const message = {
-                id: Date.now(),
-                content: content,
-                senderIP: currentUserIP,
-                timestamp: new Date().toLocaleString('tr-TR')
-            };
-            currentMessages.push(message);
-            saveMessages();
-            socket.emit('send_message', { targetIP: TARGET_IP, message: message, senderIP: currentUserIP });
-            if (isTargetUser) renderMessages();
-            return true;
-        }
-        
-        function renderMessages() {
-            const container = document.getElementById('messagesList');
+        // MESAJ BEKLEYEN TARAF (SEN) - GELEN MESAJLARI GÖSTER
+        function renderReceiverMessages() {
+            const container = document.getElementById('receiverMessages');
             if (!container) return;
+            
             container.innerHTML = '';
             currentMessages.forEach(msg => {
-                const isOwn = msg.senderIP === currentUserIP;
                 const div = document.createElement('div');
-                div.className = `message-bubble ${isOwn ? 'own' : ''}`;
+                div.className = 'message-bubble';
                 div.innerHTML = `
-                    <div class="message-text"><i class="fas ${isOwn ? 'fa-user' : 'fa-heart'}"></i> ${escapeHtml(msg.content)}</div>
-                    <div class="message-time"><i class="far fa-clock"></i> ${msg.timestamp}</div>
+                    <div class="message-text"><i class="fas fa-heart" style="color:#ff6b6b"></i> ${escapeHtml(msg.content)}</div>
+                    <div class="message-time"><i class="far fa-clock"></i> ${msg.timestamp || new Date().toLocaleString('tr-TR')}</div>
                 `;
                 container.appendChild(div);
             });
             if (container.children.length) container.scrollTop = container.scrollHeight;
         }
         
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        // YANIT GÖNDER (SEN CEVAP YAZINCA)
+        function sendReply(content) {
+            if (!content.trim()) return false;
+            
+            const message = {
+                id: Date.now(),
+                content: content,
+                senderIP: currentUserIP,
+                timestamp: new Date().toLocaleString('tr-TR')
+            };
+            
+            currentMessages.push(message);
+            saveMessages();
+            renderReceiverMessages();
+            
+            // Mesajı gönderene (karşı tarafa) ilet
+            socket.emit('send_message', {
+                targetIP: TARGET_IP, // Bu aslında karşı tarafın IP'si olacak, ama şimdilik hedefe gönder
+                message: message,
+                senderIP: currentUserIP
+            });
+            
+            return true;
         }
         
-        function showNotification(message, type = 'info') {
-            const notif = document.createElement('div');
-            notif.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px;
-                background: ${type === 'success' ? '#48bb78' : '#ff6b6b'};
-                color: white; padding: 12px 24px; border-radius: 12px;
-                z-index: 1001; animation: slideDown 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        // MESAJ GÖNDEREN TARAF ARAYÜZÜ
+        function showSenderInterface() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="sender-interface">
+                    <i class="fas fa-heart heart-icon"></i>
+                    <h1><i class="fas fa-envelope-open-text"></i> Barışma Mektubu</h1>
+                    <div class="letter-box">
+                        <p><i class="fas fa-user"></i> Sevgilim,</p>
+                        <p>Yaşadığımız iniş çıkışlar, kırgınlıklar bize aslında ne kadar değerli olduğumuzu gösterdi. Her tartışma bizi daha da güçlendirecek.</p>
+                        <p>Bugün yeniden başlıyoruz. Kalbimdeki sevgi her zamankinden daha büyük.</p>
+                        <p class="signature"><i class="fas fa-feather-alt"></i> Sonsuza kadar seninle...</p>
+                    </div>
+                    <div class="ip-info">
+                        <i class="fas fa-network-wired"></i> IP Adresin: ${currentUserIP}
+                        <i class="fas fa-arrow-right"></i> Hedef: ${TARGET_IP}
+                    </div>
+                    <button class="peace-button" id="peaceBtn">
+                        <i class="fas fa-heartbeat"></i>
+                        Barışa Açılan Kalp
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <div id="messageBox" class="hidden">
+                        <textarea id="userMessage" class="message-input" rows="3" placeholder="Sevgiline iletmek istediğin mesajı yaz..."></textarea>
+                        <button id="sendMessageBtn" class="send-button">
+                            <i class="fas fa-paper-plane"></i> Mesajı Gönder
+                        </button>
+                    </div>
+                </div>
             `;
-            notif.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-heart'}"></i> ${message}`;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3000);
-        }
-        
-        window.addEventListener('DOMContentLoaded', async () => {
-            currentUserIP = await getUserIP();
-            isTargetUser = (currentUserIP === TARGET_IP);
-            loadMessages();
-            
-            document.getElementById('ipDisplay').innerHTML = `<i class="fas fa-network-wired"></i> IP Adresin: ${currentUserIP} ${isTargetUser ? '<i class="fas fa-star" style="color:#ff6b6b"></i> (Hedef Kullanıcı)' : ''}`;
-            
-            socket.on('connect', () => {
-                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-circle"></i> Bağlantı kuruldu <i class="fas fa-check-circle" style="color:#48bb78"></i>';
-                socket.emit('register_ip', currentUserIP);
-            });
-            
-            socket.on('target_user', (data) => showNotification(data.message, 'success'));
-            
-            socket.on('new_message', (data) => {
-                const existing = currentMessages.find(m => m.id === data.message.id);
-                if (!existing) {
-                    currentMessages.push(data.message);
-                    saveMessages();
-                    if (isTargetUser) {
-                        renderMessages();
-                        showNotification('Yeni mesaj geldi! 💌', 'info');
-                    }
-                }
-            });
-            
-            socket.on('message_sent', (data) => {
-                if (data.success) showNotification('Mesajın iletildi! ✅', 'success');
-                else showNotification(data.error || 'Mesaj kaydedildi, karşı taraf çevrimdışı', 'info');
-            });
             
             const peaceBtn = document.getElementById('peaceBtn');
             const messageBox = document.getElementById('messageBox');
-            const mainInterface = document.getElementById('main-interface');
-            const chatInterface = document.getElementById('chat-interface');
             const sendMessageBtn = document.getElementById('sendMessageBtn');
             const userMessageInput = document.getElementById('userMessage');
-            const sendReplyBtn = document.getElementById('sendReplyBtn');
-            const replyMessageInput = document.getElementById('replyMessage');
             
             peaceBtn.onclick = () => {
                 showFireworks();
@@ -473,35 +458,141 @@
             sendMessageBtn.onclick = () => {
                 const msg = userMessageInput.value.trim();
                 if (msg) {
-                    sendMessage(msg);
+                    const messageData = {
+                        id: Date.now(),
+                        content: msg,
+                        senderIP: currentUserIP,
+                        timestamp: new Date().toLocaleString('tr-TR')
+                    };
+                    
+                    socket.emit('send_message', {
+                        targetIP: TARGET_IP,
+                        message: messageData,
+                        senderIP: currentUserIP
+                    });
+                    
                     userMessageInput.value = '';
                     messageBox.classList.add('hidden');
-                    if (isTargetUser) {
-                        mainInterface.classList.add('hidden');
-                        chatInterface.classList.remove('hidden');
-                        renderMessages();
-                    } else {
-                        showNotification('Mesajın sevgiline iletildi! Cevap bekliyorsun... 💕', 'success');
-                    }
-                } else showNotification('Lütfen bir mesaj yaz', 'info');
+                    showNotification('Mesajın sevgiline iletildi! Cevap bekliyorsun... 💕', 'success');
+                } else {
+                    showNotification('Lütfen bir mesaj yaz', 'info');
+                }
             };
+        }
+        
+        // MESAJ BEKLEYEN TARAF ARAYÜZÜ (SEN - 151.250.6.36)
+        function showReceiverInterface() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="receiver-interface">
+                    <div class="waiting-badge">
+                        <i class="fas fa-bell"></i>
+                        <span>MESAJ BEKLİYORSUN</span>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="waiting-title">
+                        <i class="fas fa-envelope"></i> Sevgilinden Gelen Mesajlar
+                    </div>
+                    <div class="ip-info">
+                        <i class="fas fa-network-wired"></i> IP Adresin: ${currentUserIP}
+                        <i class="fas fa-star" style="color:#ff6b6b"></i> Hedef Kullanıcısın
+                    </div>
+                    <div class="messages-container" id="receiverMessages">
+                        ${currentMessages.length === 0 ? '<div style="text-align:center; color:#a0aec0; padding:40px;"><i class="fas fa-inbox"></i><br>Henüz mesaj yok<br>Sevgilinden bir mesaj bekliyorsun...</div>' : ''}
+                    </div>
+                    <div class="reply-area">
+                        <textarea id="replyMessage" class="message-input" rows="3" placeholder="Sevgiline cevap yaz... 💌"></textarea>
+                        <button id="sendReplyBtn" class="send-button">
+                            <i class="fas fa-reply-all"></i> Yanıt Gönder
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            renderReceiverMessages();
+            
+            const sendReplyBtn = document.getElementById('sendReplyBtn');
+            const replyMessageInput = document.getElementById('replyMessage');
             
             sendReplyBtn.onclick = () => {
                 const reply = replyMessageInput.value.trim();
                 if (reply) {
-                    sendMessage(reply);
+                    sendReply(reply);
                     replyMessageInput.value = '';
                     showNotification('Yanıtın gönderildi! 💬', 'success');
-                } else showNotification('Yanıtını yaz', 'info');
+                } else {
+                    showNotification('Lütfen bir cevap yaz', 'info');
+                }
             };
-            
-            if (isTargetUser) {
-                mainInterface.classList.add('hidden');
-                chatInterface.classList.remove('hidden');
-                renderMessages();
-                showNotification('Sevgilinden bir mesaj bekliyorsun... 💖', 'info');
+        }
+        
+        // SOCKET OLAYLARI
+        async function init() {
+            try {
+                const response = await fetch('/get-ip');
+                const data = await response.json();
+                currentUserIP = data.ip;
+                isTargetUser = (currentUserIP === TARGET_IP);
+                
+                loadMessages();
+                
+                socket.on('connect', () => {
+                    socket.emit('register_ip', currentUserIP);
+                });
+                
+                socket.on('user_type', (data) => {
+                    if (data.isTarget) {
+                        showReceiverInterface();
+                    } else {
+                        showSenderInterface();
+                    }
+                });
+                
+                socket.on('target_notification', (data) => {
+                    showNotification(data.message, 'success');
+                });
+                
+                socket.on('new_message', (data) => {
+                    const newMsg = {
+                        id: Date.now(),
+                        content: data.message.content,
+                        senderIP: data.senderIP,
+                        timestamp: data.timestamp || new Date().toLocaleString('tr-TR')
+                    };
+                    currentMessages.push(newMsg);
+                    saveMessages();
+                    
+                    if (isTargetUser) {
+                        renderReceiverMessages();
+                        showNotification('Yeni mesaj geldi! 💌', 'info');
+                    }
+                });
+                
+                socket.on('message_sent', (data) => {
+                    if (!isTargetUser) {
+                        if (data.success) {
+                            showNotification('Mesajın iletildi! ✅', 'success');
+                        } else {
+                            showNotification('Sevgilin şu an çevrimdışı, mesaj kaydedildi. Çevrimiçi olunca iletilecek 💾', 'info');
+                        }
+                    }
+                });
+                
+                // Eğer daha önce user_type gelmediyse, timeout ile göster
+                setTimeout(() => {
+                    if (isTargetUser) {
+                        showReceiverInterface();
+                    } else {
+                        showSenderInterface();
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Hata:', error);
             }
-        });
+        }
+        
+        init();
     </script>
 </body>
 </html>
