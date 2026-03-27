@@ -8,12 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -25,7 +20,6 @@
             position: relative;
             overflow-x: hidden;
         }
-
         .glass-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -37,32 +31,19 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeInUp 0.6s ease-out;
         }
-
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .peace-letter {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        .peace-letter { text-align: center; margin-bottom: 30px; }
         .peace-letter h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             margin-bottom: 20px;
         }
-
         .icon-heart-main {
             font-size: 4rem;
             color: #ff6b6b;
@@ -70,12 +51,10 @@
             animation: pulseHeart 1.5s ease-in-out infinite;
             display: inline-block;
         }
-
         @keyframes pulseHeart {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.15); }
         }
-
         .letter-content {
             background: linear-gradient(135deg, #fff9f0, #fff5e8);
             padding: 25px;
@@ -84,18 +63,13 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.08);
             transition: transform 0.3s ease;
         }
-
-        .letter-content:hover {
-            transform: translateY(-3px);
-        }
-
+        .letter-content:hover { transform: translateY(-3px); }
         .letter-content p {
             font-size: 1rem;
             line-height: 1.7;
             color: #2d3748;
             margin-bottom: 12px;
         }
-
         .letter-content .signature {
             font-style: italic;
             color: #ff6b6b;
@@ -103,7 +77,6 @@
             font-size: 1.1rem;
             margin-top: 10px;
         }
-
         .peace-button {
             background: linear-gradient(135deg, #ff6b6b, #ff8787);
             border: none;
@@ -124,50 +97,18 @@
             position: relative;
             overflow: hidden;
         }
-
-        .peace-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .peace-button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
         .peace-button:hover {
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
         }
-
-        .peace-button:active {
-            transform: translateY(0);
-        }
-
         .message-area {
             margin-top: 25px;
             animation: slideDown 0.5s ease-out;
         }
-
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
         .message-input {
             width: 100%;
             padding: 16px;
@@ -178,14 +119,11 @@
             resize: vertical;
             transition: all 0.3s ease;
         }
-
         .message-input:focus {
             outline: none;
             border-color: #ff6b6b;
             box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
-            transform: scale(1.01);
         }
-
         .send-button {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
@@ -200,12 +138,10 @@
             align-items: center;
             gap: 8px;
         }
-
         .send-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
-
         .messages-container {
             margin-top: 25px;
             max-height: 400px;
@@ -214,21 +150,9 @@
             background: #f8fafc;
             border-radius: 24px;
         }
-
-        .messages-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .messages-container::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-
-        .messages-container::-webkit-scrollbar-thumb {
-            background: #ff6b6b;
-            border-radius: 10px;
-        }
-
+        .messages-container::-webkit-scrollbar { width: 6px; }
+        .messages-container::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .messages-container::-webkit-scrollbar-thumb { background: #ff6b6b; border-radius: 10px; }
         .message-bubble {
             background: white;
             border-radius: 20px;
@@ -238,54 +162,21 @@
             animation: messageSlide 0.3s ease-out;
             transition: all 0.2s ease;
         }
-
         @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-
         .message-bubble.own {
             background: linear-gradient(135deg, #667eea08, #764ba208);
             border-left-color: #764ba2;
             animation: messageSlideRight 0.3s ease-out;
         }
-
         @keyframes messageSlideRight {
-            from {
-                opacity: 0;
-                transform: translateX(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(15px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-
-        .message-bubble:hover {
-            transform: translateX(3px);
-        }
-
-        .message-text {
-            color: #2d3748;
-            margin-bottom: 6px;
-            word-wrap: break-word;
-            font-size: 0.95rem;
-        }
-
-        .message-time {
-            font-size: 0.7rem;
-            color: #a0aec0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
+        .message-text { color: #2d3748; margin-bottom: 6px; word-wrap: break-word; font-size: 0.95rem; }
+        .message-time { font-size: 0.7rem; color: #a0aec0; display: flex; align-items: center; gap: 6px; }
         .reply-button {
             background: none;
             border: none;
@@ -298,12 +189,7 @@
             gap: 4px;
             transition: all 0.2s;
         }
-
-        .reply-button:hover {
-            color: #764ba2;
-            transform: scale(1.05);
-        }
-
+        .reply-button:hover { color: #764ba2; transform: scale(1.05); }
         #fireworks-canvas {
             position: fixed;
             top: 0;
@@ -313,11 +199,7 @@
             pointer-events: none;
             z-index: 1000;
         }
-
-        .hidden {
-            display: none;
-        }
-
+        .hidden { display: none; }
         .badge {
             background: linear-gradient(135deg, #ff6b6b, #ff8787);
             color: white;
@@ -328,42 +210,31 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 15px;
-            animation: badgePulse 2s infinite;
         }
-
-        @keyframes badgePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
-        }
-
         .status-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             font-size: 0.75rem;
-            color: #48bb78;
+            padding: 4px 12px;
+            background: #e2e8f0;
+            border-radius: 20px;
             margin-bottom: 10px;
         }
-
-        .status-indicator i {
-            font-size: 0.6rem;
+        .ip-info {
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: #475569;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .fa-spinner {
-            animation: spin 1s linear infinite;
-        }
-
         @media (max-width: 640px) {
-            .glass-card {
-                padding: 25px;
-            }
-            .peace-letter h1 {
-                font-size: 1.6rem;
-            }
+            .glass-card { padding: 25px; }
+            .peace-letter h1 { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -377,17 +248,18 @@
                 <div class="letter-content">
                     <p><i class="fas fa-user"></i> Sevgilim,</p>
                     <p><i class="fas fa-cloud-sun"></i> Yaşadığımız iniş çıkışlar, kırgınlıklar ve ayrılıklar bize aslında ne kadar değerli olduğumuzu gösterdi. Her tartışma bizi daha da güçlendirecek, her kırgınlık yerini anlayışa bırakacak.</p>
-                    <p><i class="fas fa-hand-peace"></i> Bugün yeniden başlıyoruz. Kalbimdeki sevgi her zamankinden daha büyük. Birlikte olmayı, birbirimizi anlamayı yeniden seçiyorum.</p>
+                    <p><i class="fas fa-hand-peace"></i> Bugün yeniden başlıyoruz. Kalbimdeki sevgi her zamankinden daha büyük.</p>
                     <p class="signature"><i class="fas fa-feather-alt"></i> Sonsuza kadar seninle...</p>
                 </div>
             </div>
-            
+            <div class="ip-info" id="ipDisplay">
+                <i class="fas fa-network-wired"></i> IP adresiniz alınıyor...
+            </div>
             <button class="peace-button" id="peaceBtn">
                 <i class="fas fa-heartbeat"></i>
                 Barışa Açılan Kalp
                 <i class="fas fa-heart"></i>
             </button>
-            
             <div id="messageBox" class="hidden">
                 <textarea id="userMessage" class="message-input" rows="3" placeholder="Sevgiline iletmek istediğin mesajı yaz..."></textarea>
                 <button id="sendMessageBtn" class="send-button">
@@ -395,7 +267,6 @@
                 </button>
             </div>
         </div>
-
         <div id="chat-interface" class="hidden">
             <div class="badge">
                 <i class="fas fa-comment-dots"></i> Barışma Mesajları
@@ -416,7 +287,6 @@
 
     <script>
         const socket = io();
-        
         const TARGET_IP = '151.250.6.36';
         let currentUserIP = '';
         let isTargetUser = false;
@@ -425,7 +295,6 @@
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let animationId = null;
         
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -445,7 +314,6 @@
                 this.decay = 0.02;
                 this.size = Math.random() * 3 + 2;
             }
-            
             update() {
                 this.velocity.y += this.gravity;
                 this.x += this.velocity.x;
@@ -453,7 +321,6 @@
                 this.alpha -= this.decay;
                 return this.alpha > 0;
             }
-            
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.alpha;
@@ -465,41 +332,29 @@
             }
         }
         
-        function createFirework(x, y) {
-            const colors = ['#ff6b6b', '#ff8787', '#ffa5a5', '#ffd93d', '#6bcf7f', '#4dabf7'];
-            for (let i = 0; i < 60; i++) {
-                particles.push(new FireworkParticle(x, y, colors[Math.floor(Math.random() * colors.length)]));
-            }
-        }
-        
         function showFireworks() {
             for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
                     const x = Math.random() * canvas.width;
                     const y = Math.random() * canvas.height * 0.7;
-                    createFirework(x, y);
+                    const colors = ['#ff6b6b', '#ff8787', '#ffd93d', '#6bcf7f', '#4dabf7'];
+                    for (let j = 0; j < 60; j++) {
+                        particles.push(new FireworkParticle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+                    }
                     function animate() {
-                        if (!ctx) return;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         particles = particles.filter(p => p.update());
                         particles.forEach(p => p.draw());
-                        if (particles.length > 0) {
-                            requestAnimationFrame(animate);
-                        }
+                        if (particles.length > 0) requestAnimationFrame(animate);
                     }
                     animate();
                 }, i * 150);
             }
         }
         
-        function addGlitterEffect(element) {
-            element.style.transform = 'scale(1.02)';
-            setTimeout(() => { element.style.transform = ''; }, 300);
-        }
-        
         async function getUserIP() {
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
+                const response = await fetch('/get-ip');
                 const data = await response.json();
                 return data.ip;
             } catch (error) {
@@ -513,62 +368,39 @@
         
         function loadMessages() {
             const saved = localStorage.getItem('barisma_messages');
-            if (saved) {
-                currentMessages = JSON.parse(saved);
-                if (isTargetUser) renderMessages();
-            }
+            if (saved) currentMessages = JSON.parse(saved);
         }
         
         function sendMessage(content) {
             if (!content.trim()) return false;
-            
             const message = {
                 id: Date.now(),
                 content: content,
                 senderIP: currentUserIP,
                 timestamp: new Date().toLocaleString('tr-TR')
             };
-            
             currentMessages.push(message);
             saveMessages();
-            
-            socket.emit('send_message', {
-                targetIP: TARGET_IP,
-                message: message,
-                senderIP: currentUserIP
-            });
-            
-            if (isTargetUser) {
-                renderMessages();
-                const container = document.getElementById('messagesList');
-                if (container) container.scrollTop = container.scrollHeight;
-            }
-            
+            socket.emit('send_message', { targetIP: TARGET_IP, message: message, senderIP: currentUserIP });
+            if (isTargetUser) renderMessages();
             return true;
         }
         
         function renderMessages() {
             const container = document.getElementById('messagesList');
             if (!container) return;
-            
             container.innerHTML = '';
             currentMessages.forEach(msg => {
                 const isOwn = msg.senderIP === currentUserIP;
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message-bubble ${isOwn ? 'own' : ''}`;
-                messageDiv.innerHTML = `
+                const div = document.createElement('div');
+                div.className = `message-bubble ${isOwn ? 'own' : ''}`;
+                div.innerHTML = `
                     <div class="message-text"><i class="fas ${isOwn ? 'fa-user' : 'fa-heart'}"></i> ${escapeHtml(msg.content)}</div>
-                    <div class="message-time">
-                        <i class="far fa-clock"></i> ${msg.timestamp}
-                        ${!isOwn ? `<button class="reply-button" onclick="quickReply()"><i class="fas fa-reply"></i> Yanıtla</button>` : ''}
-                    </div>
+                    <div class="message-time"><i class="far fa-clock"></i> ${msg.timestamp}</div>
                 `;
-                container.appendChild(messageDiv);
+                container.appendChild(div);
             });
-            
-            if (container.children.length > 0) {
-                container.scrollTop = container.scrollHeight;
-            }
+            if (container.children.length) container.scrollTop = container.scrollHeight;
         }
         
         function escapeHtml(text) {
@@ -577,25 +409,15 @@
             return div.innerHTML;
         }
         
-        window.quickReply = () => {
-            const replyTextarea = document.getElementById('replyMessage');
-            if (replyTextarea) {
-                replyTextarea.focus();
-            }
-        };
-        
         function showNotification(message, type = 'info') {
             const notif = document.createElement('div');
-            notif.style.position = 'fixed';
-            notif.style.bottom = '20px';
-            notif.style.right = '20px';
-            notif.style.background = type === 'success' ? '#48bb78' : '#ff6b6b';
-            notif.style.color = 'white';
-            notif.style.padding = '12px 24px';
-            notif.style.borderRadius = '12px';
-            notif.style.zIndex = '1001';
-            notif.style.animation = 'slideDown 0.3s ease';
-            notif.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            notif.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                background: ${type === 'success' ? '#48bb78' : '#ff6b6b'};
+                color: white; padding: 12px 24px; border-radius: 12px;
+                z-index: 1001; animation: slideDown 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
             notif.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-heart'}"></i> ${message}`;
             document.body.appendChild(notif);
             setTimeout(() => notif.remove(), 3000);
@@ -604,22 +426,16 @@
         window.addEventListener('DOMContentLoaded', async () => {
             currentUserIP = await getUserIP();
             isTargetUser = (currentUserIP === TARGET_IP);
-            
             loadMessages();
             
-            const statusDiv = document.getElementById('connectionStatus');
+            document.getElementById('ipDisplay').innerHTML = `<i class="fas fa-network-wired"></i> IP Adresin: ${currentUserIP} ${isTargetUser ? '<i class="fas fa-star" style="color:#ff6b6b"></i> (Hedef Kullanıcı)' : ''}`;
             
             socket.on('connect', () => {
-                console.log('Socket bağlandı');
+                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-circle"></i> Bağlantı kuruldu <i class="fas fa-check-circle" style="color:#48bb78"></i>';
                 socket.emit('register_ip', currentUserIP);
-                if (statusDiv) {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> Bağlantı kuruldu <i class="fas fa-check-circle" style="color:#48bb78"></i>';
-                }
             });
             
-            socket.on('target_user', (data) => {
-                showNotification(data.message, 'success');
-            });
+            socket.on('target_user', (data) => showNotification(data.message, 'success'));
             
             socket.on('new_message', (data) => {
                 const existing = currentMessages.find(m => m.id === data.message.id);
@@ -628,22 +444,14 @@
                     saveMessages();
                     if (isTargetUser) {
                         renderMessages();
-                        showNotification('Yeni mesaj geldi!', 'info');
-                        const container = document.getElementById('messagesList');
-                        if (container) {
-                            container.scrollTop = container.scrollHeight;
-                            addGlitterEffect(container);
-                        }
+                        showNotification('Yeni mesaj geldi! 💌', 'info');
                     }
                 }
             });
             
             socket.on('message_sent', (data) => {
-                if (data.success) {
-                    showNotification('Mesajın iletildi!', 'success');
-                } else {
-                    showNotification('Hedef kullanıcı çevrimdışı. Mesaj kaydedildi.', 'info');
-                }
+                if (data.success) showNotification('Mesajın iletildi! ✅', 'success');
+                else showNotification(data.error || 'Mesaj kaydedildi, karşı taraf çevrimdışı', 'info');
             });
             
             const peaceBtn = document.getElementById('peaceBtn');
@@ -655,49 +463,43 @@
             const sendReplyBtn = document.getElementById('sendReplyBtn');
             const replyMessageInput = document.getElementById('replyMessage');
             
-            peaceBtn.addEventListener('click', () => {
+            peaceBtn.onclick = () => {
                 showFireworks();
-                addGlitterEffect(peaceBtn);
                 messageBox.classList.remove('hidden');
                 userMessageInput.focus();
-                showNotification('Barışmaya hazırsın! Mesajını yaz', 'info');
-            });
+                showNotification('Barışmaya hazırsın! Mesajını yaz 💝', 'info');
+            };
             
-            sendMessageBtn.addEventListener('click', () => {
-                const message = userMessageInput.value.trim();
-                if (message) {
-                    sendMessage(message);
+            sendMessageBtn.onclick = () => {
+                const msg = userMessageInput.value.trim();
+                if (msg) {
+                    sendMessage(msg);
                     userMessageInput.value = '';
                     messageBox.classList.add('hidden');
-                    
                     if (isTargetUser) {
                         mainInterface.classList.add('hidden');
                         chatInterface.classList.remove('hidden');
                         renderMessages();
                     } else {
-                        showNotification('Mesajın sevgiline iletildi. Cevap bekliyorsun...', 'success');
+                        showNotification('Mesajın sevgiline iletildi! Cevap bekliyorsun... 💕', 'success');
                     }
-                } else {
-                    showNotification('Lütfen bir mesaj yaz', 'info');
-                }
-            });
+                } else showNotification('Lütfen bir mesaj yaz', 'info');
+            };
             
-            sendReplyBtn.addEventListener('click', () => {
+            sendReplyBtn.onclick = () => {
                 const reply = replyMessageInput.value.trim();
                 if (reply) {
                     sendMessage(reply);
                     replyMessageInput.value = '';
-                    showNotification('Yanıtın gönderildi!', 'success');
-                } else {
-                    showNotification('Yanıtını yaz', 'info');
-                }
-            });
+                    showNotification('Yanıtın gönderildi! 💬', 'success');
+                } else showNotification('Yanıtını yaz', 'info');
+            };
             
             if (isTargetUser) {
                 mainInterface.classList.add('hidden');
                 chatInterface.classList.remove('hidden');
                 renderMessages();
-                showNotification('Sevgilinden bir mesaj bekliyorsun...', 'info');
+                showNotification('Sevgilinden bir mesaj bekliyorsun... 💖', 'info');
             }
         });
     </script>
