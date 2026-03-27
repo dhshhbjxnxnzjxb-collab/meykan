@@ -20,11 +20,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // HEDEF IP (MESAJ BEKLEYEN KİŞİ - SEN)
 const TARGET_IP = '151.250.6.36';
 
-// Kullanıcıları sakla
 const userSockets = new Map();
 const ipToSocket = new Map();
 
-// Offline mesajlar için dosya
 const OFFLINE_FILE = path.join(__dirname, 'offline_messages.json');
 if (!fs.existsSync(OFFLINE_FILE)) {
   fs.writeFileSync(OFFLINE_FILE, JSON.stringify([]));
@@ -34,22 +32,52 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/get-ip', (req, res) => {
+// GERÇEK IP'Yİ DOĞRU ALAN FONKSİYON
+function getRealIP(req) {
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  
+  // Eğer birden fazla IP varsa (proxy'den geliyorsa), ilkini al (gerçek kullanıcı IP'si)
+  if (ip && ip.includes(',')) {
+    ip = ip.split(',')[0].trim();
+  }
+  
+  // IPv6 prefix'ini temizle
   ip = ip.replace('::ffff:', '').replace('::1', '127.0.0.1');
-  res.json({ ip: ip, isTarget: ip === TARGET_IP });
+  
+  // Localhost ise 127.0.0.1 yap
+  if (ip === '::1' || ip === 'localhost') {
+    ip = '127.0.0.1';
+  }
+  
+  return ip;
+}
+
+app.get('/get-ip', (req, res) => {
+  const ip = getRealIP(req);
+  res.json({ 
+    ip: ip, 
+    isTarget: (ip === TARGET_IP),
+    rawHeaders: req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  });
 });
 
 io.on('connection', (socket) => {
   console.log('🔌 Yeni bağlantı:', socket.id);
 
   socket.on('register_ip', (ip) => {
-    console.log(`📝 IP kaydedildi: ${ip}`);
-    userSockets.set(socket.id, { ip, socket });
-    ipToSocket.set(ip, socket.id);
+    // IP'yi temizle
+    let cleanIp = ip;
+    if (cleanIp && cleanIp.includes(',')) {
+      cleanIp = cleanIp.split(',')[0].trim();
+    }
+    cleanIp = cleanIp.replace('::ffff:', '');
     
-    const isTarget = (ip === TARGET_IP);
-    socket.emit('user_type', { isTarget: isTarget, myIp: ip });
+    console.log(`📝 IP kaydedildi: ${cleanIp}`);
+    userSockets.set(socket.id, { ip: cleanIp, socket });
+    ipToSocket.set(cleanIp, socket.id);
+    
+    const isTarget = (cleanIp === TARGET_IP);
+    socket.emit('user_type', { isTarget: isTarget, myIp: cleanIp });
     
     if (isTarget) {
       console.log('🎯 HEDEF KULLANICI (SEN) BAĞLANDI!');
@@ -57,9 +85,8 @@ io.on('connection', (socket) => {
         message: '💖 Barışma portalına hoş geldin! Sevgilinden gelecek mesajları burada bekliyorsun.' 
       });
       
-      // Offline mesajları kontrol et
       const offlineMessages = JSON.parse(fs.readFileSync(OFFLINE_FILE, 'utf8'));
-      const myMessages = offlineMessages.filter(m => m.targetIP === ip);
+      const myMessages = offlineMessages.filter(m => m.targetIP === cleanIp);
       if (myMessages.length > 0) {
         myMessages.forEach(msg => {
           socket.emit('new_message', {
@@ -68,13 +95,12 @@ io.on('connection', (socket) => {
             isOffline: true
           });
         });
-        const remaining = offlineMessages.filter(m => m.targetIP !== ip);
+        const remaining = offlineMessages.filter(m => m.targetIP !== cleanIp);
         fs.writeFileSync(OFFLINE_FILE, JSON.stringify(remaining));
       }
     }
   });
 
-  // MESAJ GÖNDER (karşı taraftan gelen)
   socket.on('send_message', (data) => {
     const { targetIP, message, senderIP } = data;
     console.log(`📨 Mesaj: ${senderIP} -> ${targetIP}`);
@@ -90,7 +116,6 @@ io.on('connection', (socket) => {
       socket.emit('message_sent', { success: true, targetOnline: true });
       console.log(`✅ Mesaj iletildi: ${targetIP}`);
     } else {
-      // Offline kaydet
       const offlineMessages = JSON.parse(fs.readFileSync(OFFLINE_FILE, 'utf8'));
       offlineMessages.push({
         message: message,
@@ -119,4 +144,5 @@ server.listen(PORT, () => {
   console.log(`\n🚀 SUNUCU ÇALIŞIYOR: http://localhost:${PORT}`);
   console.log(`🎯 HEDEF IP (MESAJ BEKLEYEN): ${TARGET_IP}`);
   console.log(`📌 Bu IP'ye sahip kişi siteye girince SADECE MESAJ BEKLEME EKRANI görür\n`);
+  console.log(`💡 NOT: Eğer Cloudflare veya proxy kullanıyorsan, gerçek IP'nin ${TARGET_IP} olup olmadığını kontrol et`);
 });
